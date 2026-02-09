@@ -1,0 +1,7 @@
+1. kanap ne zaboravi
+2. zatvorena kandza
+3. da na space padne na dno a ne da dno proguta igracku
+4. rotacija za 180 stepeni
+5. tekstura potpisa
+6. frame limiter
+7. kursor

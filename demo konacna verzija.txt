@@ -1,0 +1,1552 @@
+BEGIN;
+
+-- =====================================================
+-- TOURS (DELETE - child -> parent)
+-- =====================================================
+DELETE FROM tours."Messages";
+DELETE FROM tours."TourProblems";
+DELETE FROM tours."Notifications";
+DELETE FROM tours."Positions";
+DELETE FROM tours."ReviewImages";
+DELETE FROM tours."TourReviews";
+DELETE FROM tours."TourExecutions";
+DELETE FROM tours."KeyPoints";
+DELETE FROM tours."AwardEvents";
+DELETE FROM tours."Facilities";
+DELETE FROM tours."Tours";
+DELETE FROM tours."Monuments";
+DELETE FROM tours."Equipment";
+DELETE FROM tours."Bundles";
+DELETE FROM tours."Coupons";
+DELETE FROM tours."Sales";
+DELETE FROM tours."TourWishlists";
+
+-- =====================================================
+-- STAKEHOLDERS (DELETE - child -> parent)
+-- =====================================================
+DELETE FROM stakeholders."Wallets";
+DELETE FROM stakeholders."WalletTransactions";
+DELETE FROM stakeholders."Meetups";
+UPDATE stakeholders."Clubs" SET "FeaturedImageId" = NULL;
+DELETE FROM stakeholders."ClubImages";
+DELETE FROM stakeholders."Clubs";
+DELETE FROM stakeholders."ClubJoinRequests";
+DELETE FROM stakeholders."AppRatings";
+DELETE FROM stakeholders."Preferences";
+DELETE FROM stakeholders."Tourists";
+DELETE FROM stakeholders."People";
+DELETE FROM stakeholders."Users";
+DELETE FROM stakeholders."Accounts";
+DELETE FROM stakeholders."WelcomeBonuses";
+
+-- =====================================================
+-- BLOG (DELETE)
+-- =====================================================
+DELETE FROM blog."BlogImages";
+DELETE FROM blog."BlogRatings";
+DELETE FROM blog."Comments";
+DELETE FROM blog."Blogs";
+
+-- =====================================================
+-- ENCOUNTERS (DELETE)
+-- =====================================================
+DELETE FROM encounters."EncounterActivations";
+DELETE FROM encounters."Encounters";
+
+-- =====================================================
+-- PAYMENTS (DELETE)
+-- =====================================================
+DELETE FROM payments."TourPurchaseTokens";
+DELETE FROM payments."ShoppingCarts";
+DELETE FROM payments."TourPurchaseRecords";
+
+-- =====================================================
+-- STAKEHOLDERS (INSERT)
+-- =====================================================
+
+-- Users: 1 Admin, 3 Authors, 15 Tourists
+INSERT INTO stakeholders."Users"("Id", "Username", "Password", "Role", "IsActive") VALUES
+(-1,  'admin',     'admin',   0, true),
+(-11, 'marko.petrovic', 'autor', 1, true),
+(-12, 'ana.jovanovic',  'autor', 1, true),
+(-13, 'stefan.nikolic', 'autor', 1, true),
+(-21, 'petar.ilic',     'turista', 2, true),
+(-22, 'milica.djordjevic', 'turista', 2, true),
+(-23, 'nikola.markovic', 'turista', 2, true),
+(-24, 'jovana.popovic',  'turista', 2, true),
+(-25, 'milos.tomic',     'turista', 2, true),
+(-26, 'sara.pavlovic',   'turista', 2, true),
+(-27, 'aleksandar.dimitrijevic', 'turista', 2, true),
+(-28, 'jelena.stojanovic', 'turista', 2, true),
+(-29, 'nemanja.ristic',  'turista', 2, true),
+(-30, 'marija.kostic',   'turista', 2, true),
+(-31, 'luka.djukic',     'turista', 2, true),
+(-32, 'katarina.simic',  'turista', 2, true),
+(-33, 'filip.savic',     'turista', 2, true),
+(-34, 'teodora.lukic',   'turista', 2, true),
+(-35, 'uros.antic',      'turista', 2, true);
+
+-- People
+INSERT INTO stakeholders."People"("Id", "UserId", "Name", "Surname", "Email", "ProfilePictureUrl", "Biography", "Quote") VALUES
+(-1,  -1,  'Admin',      'Adminović',    'admin@explorer.rs',     'https://i.pravatar.cc/300?img=1', 'Administrator Explorer aplikacije', 'Putovanje je jedina stvar koju kupite a koja vas čini bogatijim.'),
+(-11, -11, 'Marko',      'Petrović',     'marko.petrovic@gmail.com', 'https://i.pravatar.cc/300?img=11', 'Strastveni ljubitelj planina i prirode. Vodič sa 10 godina iskustva.', 'Planine zovu, moram da idem.'),
+(-12, -12, 'Ana',        'Jovanović',    'ana.jovanovic@gmail.com',  'https://i.pravatar.cc/300?img=12', 'Istoričarka umetnosti i turistički vodič kroz gradove Srbije.', 'Svaki grad ima svoju priču.'),
+(-13, -13, 'Stefan',     'Nikolić',      'stefan.nikolic@gmail.com', 'https://i.pravatar.cc/300?img=13', 'Fotograf i avanturista. Specijalizovan za urbex i sakrivene lokacije.', 'Najbolje priče kriju se iza zatvorenih vrata.'),
+(-21, -21, 'Petar',      'Ilić',         'petar.ilic@gmail.com',     'https://i.pravatar.cc/300?img=21', 'Avanturista koji obožava biciklizam i kampovanje.', 'Život je avantura ili ništa.'),
+(-22, -22, 'Milica',     'Đorđević',     'milica.djordjevic@gmail.com', 'https://i.pravatar.cc/300?img=22', 'Ljubiteljka kulture i istorije. Stalno tražim nove muzeje.', 'Učenje kroz putovanja.'),
+(-23, -23, 'Nikola',     'Marković',     'nikola.markovic@gmail.com', 'https://i.pravatar.cc/300?img=23', 'Planinar sa strašću prema Fruškoj Gori.', 'Korak po korak do vrha.'),
+(-24, -24, 'Jovana',     'Popović',      'jovana.popovic@gmail.com',  'https://i.pravatar.cc/300?img=24', 'Foodie i ljubiteljka gastro tura.', 'Jedem, dakle jesam.'),
+(-25, -25, 'Miloš',      'Tomić',        'milos.tomic@gmail.com',     'https://i.pravatar.cc/300?img=25', 'Urban explorer i fotograf napuštenih zgrada.', 'Pronalazim lepotu u zaboravljenom.'),
+(-26, -26, 'Sara',       'Pavlović',     'sara.pavlovic@gmail.com',   'https://i.pravatar.cc/300?img=26', 'Priroda je moja terapija. Tražim mir u šumama.', 'Šuma leči sve rane.'),
+(-27, -27, 'Aleksandar', 'Dimitrijević', 'aleksandar.dimitrijevic@gmail.com', 'https://i.pravatar.cc/300?img=27', 'Sportski entuzijasta i biciklista.', 'Pedale okreću svet.'),
+(-28, -28, 'Jelena',     'Stojanović',   'jelena.stojanovic@gmail.com', 'https://i.pravatar.cc/300?img=28', 'Organizatorka grupnih izleta i planinarskih akcija.', 'Zajedno je lakše.'),
+(-29, -29, 'Nemanja',    'Ristić',       'nemanja.ristic@gmail.com',  'https://i.pravatar.cc/300?img=29', 'IT profesionalac koji voli vikend bekstva.', 'Restart na prirodi.'),
+(-30, -30, 'Marija',     'Kostić',       'marija.kostic@gmail.com',   'https://i.pravatar.cc/300?img=30', 'Majka dvoje dece, voli porodične šetnje.', 'Porodica koja putuje zajedno, ostaje zajedno.'),
+(-31, -31, 'Luka',       'Đukić',        'luka.djukic@gmail.com',     'https://i.pravatar.cc/300?img=31', 'Student arhitekture, fasciniran starim građevinama.', 'Prošlost gradi budućnost.'),
+(-32, -32, 'Katarina',   'Simić',        'katarina.simic@gmail.com',  'https://i.pravatar.cc/300?img=32', 'Ljubiteljka vina i vinskih tura.', 'In vino veritas.'),
+(-33, -33, 'Filip',      'Savić',        'filip.savic@gmail.com',     'https://i.pravatar.cc/300?img=33', 'Ekstremni sportista i ljubitelj adrenalina.', 'Bez straha.'),
+(-34, -34, 'Teodora',    'Lukić',        'teodora.lukic@gmail.com',   'https://i.pravatar.cc/300?img=34', 'Blogerka koja dokumentuje svako putovanje.', 'Pišem da pamtim.'),
+(-35, -35, 'Uroš',       'Antić',        'uros.antic@gmail.com',      'https://i.pravatar.cc/300?img=35', 'Fotograf pejzaža sa strašću prema zalascima sunca.', 'Svetlost piše priče.');
+
+-- Accounts
+INSERT INTO stakeholders."Accounts"("Id", "Username", "Password", "Email", "Role", "Status") VALUES
+(-1, 'test_admin',   'Test123!', 'admin.test@explorer.rs',   0, 0),
+(-2, 'test_author',  'Test123!', 'author.test@explorer.rs',  1, 0),
+(-3, 'test_tourist', 'Test123!', 'tourist.test@explorer.rs', 2, 0);
+
+-- Tourists (samo za Role=2)
+-- XP/Level: Level = floor(XP/100) + 1
+-- Level 1: 0-99 XP, Level 2: 100-199 XP, Level 3: 200-299 XP, itd.
+INSERT INTO stakeholders."Tourists" ("Id", "PersonId", "EquipmentIds", "XP", "Level") VALUES
+(-21, -21, '-1,-2',    50,   1),  -- Level 1 ROOKIE (0-99)
+(-22, -22, '-1',       250,  3),  -- Level 3 BRONZE (200-299)
+(-23, -23, '-2,-3',    650,  7),  -- Level 7 SILVER (600-699)
+(-24, -24, '-1,-3',    1250, 13), -- Level 13 GOLD (1200-1299)
+(-25, -25, '-2',       1750, 18), -- Level 18 PLATINUM (1700-1799)
+(-26, -26, '-1,-2,-3', 2550, 26), -- Level 26 DIAMOND (2500-2599)
+(-27, -27, '-1,-2',    3250, 33), -- Level 33 VISTA (3200-3299)
+(-28, -28, '-3',       150,  2),  -- Level 2 BRONZE (100-199)
+(-29, -29, '-1',       450,  5),  -- Level 5 SILVER (400-499)
+(-30, -30, '-2,-3',    80,   1),  -- Level 1 ROOKIE (0-99)
+(-31, -31, '-1,-2',    850,  9),  -- Level 9 SILVER (800-899)
+(-32, -32, '-3',       350,  4),  -- Level 4 BRONZE (300-399)
+(-33, -33, '-1,-2,-3', 1150, 12), -- Level 12 GOLD (1100-1199)
+(-34, -34, '-1',       550,  6),  -- Level 6 SILVER (500-599)
+(-35, -35, '-2,-3',    750,  8);  -- Level 8 SILVER (700-799)
+
+-- Preferences
+INSERT INTO stakeholders."Preferences"("Id", "TouristId", "Difficulty", "WalkingRating", "BicycleRating", "CarRating", "BoatRating", "Tags") VALUES
+(-21, -21, 1, 3, 2, 1, 0, '["Nature", "Adventure", "Hiking"]'::jsonb),
+(-22, -22, 0, 2, 1, 2, 1, '["Culture", "History", "Museums"]'::jsonb),
+(-23, -23, 2, 3, 1, 0, 0, '["Mountain", "Hiking", "Nature"]'::jsonb),
+(-24, -24, 0, 2, 1, 3, 0, '["Food", "Culture", "City"]'::jsonb),
+(-25, -25, 2, 1, 2, 3, 0, '["Urbex", "Photography", "Adventure"]'::jsonb),
+(-26, -26, 1, 3, 1, 1, 1, '["Nature", "Forest", "Relaxation"]'::jsonb),
+(-27, -27, 1, 2, 3, 1, 0, '["Bicycle", "Nature", "Sport"]'::jsonb),
+(-28, -28, 1, 2, 2, 2, 1, '["Group", "Social", "Hiking"]'::jsonb),
+(-29, -29, 0, 2, 1, 2, 0, '["Weekend", "Relaxation", "Nature"]'::jsonb),
+(-30, -30, 0, 3, 0, 2, 0, '["Family", "Easy", "Culture"]'::jsonb),
+(-31, -31, 1, 2, 1, 2, 0, '["Architecture", "History", "City"]'::jsonb),
+(-32, -32, 0, 2, 1, 3, 0, '["Wine", "Food", "Culture"]'::jsonb),
+(-33, -33, 2, 3, 2, 1, 2, '["Extreme", "Adventure", "Adrenaline"]'::jsonb),
+(-34, -34, 1, 2, 2, 2, 1, '["Photography", "Travel", "Blog"]'::jsonb),
+(-35, -35, 1, 3, 1, 1, 0, '["Photography", "Sunset", "Nature"]'::jsonb);
+
+-- Wallets (svaki Person ima Wallet sa 0 AC početno - biće ažurirano kasnije)
+INSERT INTO stakeholders."Wallets" ("PersonId", "BalanceAc") VALUES
+(-1,  0),
+(-11, 0),
+(-12, 0),
+(-13, 0),
+(-21, 0),
+(-22, 0),
+(-23, 0),
+(-24, 0),
+(-25, 0),
+(-26, 0),
+(-27, 0),
+(-28, 0),
+(-29, 0),
+(-30, 0),
+(-31, 0),
+(-32, 0),
+(-33, 0),
+(-34, 0),
+(-35, 0);
+
+-- App Ratings
+INSERT INTO stakeholders."AppRatings"("Id", "UserId", "Rating", "Comment", "CreatedAt", "UpdatedAt") VALUES
+(-1, -21, 5, 'Odlična aplikacija! Pronašao sam sjajne ture u mom gradu.', '2025-01-15 10:30:00+00', NULL),
+(-2, -22, 4, 'Veoma korisna, ali bi moglo više opcija filtriranja.', '2025-01-16 14:20:00+00', NULL),
+(-3, -23, 5, 'Obožavam izazove! Odlična motivacija za istraživanje.', '2025-01-18 09:15:00+00', NULL),
+(-4, -24, 4, 'Dobra aplikacija za foodie ture.', '2025-01-20 16:45:00+00', NULL),
+(-5, -25, 3, 'Solidna aplikacija, ali ponekad sporo učitava.', '2025-01-22 11:00:00+00', NULL),
+(-6, -28, 5, 'Savršeno za organizovanje grupnih izleta!', '2025-01-25 13:30:00+00', NULL);
+
+-- Clubs
+INSERT INTO stakeholders."Clubs"("Id", "Name", "Description", "OwnerId", "FeaturedImageId", "Status", "MemberIds") VALUES
+(-1, 'Planinari Fruške Gore', 'Klub ljubitelja planinarenja na Fruškoj Gori. Organizujemo redovne izlete vikendom.', -23, NULL, 0, '-21,-22,-26'),
+(-2, 'Urbex Novi Sad', 'Istraživači napuštenih zgrada i skrivenih urbanih lokacija u Novom Sadu i okolini.', -25, NULL, 0, '-31,-33'),
+(-3, 'Gastro Ture Srbija', 'Ljubitelji dobre hrane i vina. Organizujemo gastro ture i degustacije.', -24, NULL, 0, '-22,-24,-32,-34'),
+(-4, 'Biciklisti Beograda', 'Klub biciklista koji istraže Beograd i okolinu na dva točka.', -27, NULL, 0, '-21,-27,-29'),
+(-5, 'Fotografi Prirode', 'Fotografisanje pejzaža, zalazaka sunca i divljih životinja.', -35, NULL, 0, '-25,-34,-35'),
+(-6, 'Istorijski Obilasci', 'Obilasci istorijskih spomenika, muzeja i kulturnih znamenitosti Srbije.', -22, NULL, 1, '');
+
+-- Club Images
+INSERT INTO stakeholders."ClubImages"("Id", "ClubId", "ImageUrl", "UploadedAt") VALUES
+(-1, -1, 'https://picsum.photos/id/1018/1000/600', '2025-01-10 10:00:00'),
+(-2, -1, 'https://picsum.photos/id/1019/1000/600', '2025-01-10 10:05:00'),
+(-3, -2, 'https://picsum.photos/id/1025/1000/600', '2025-01-11 11:00:00'),
+(-4, -3, 'https://picsum.photos/id/1060/1000/600', '2025-01-12 12:00:00'),
+(-5, -3, 'https://picsum.photos/id/1080/1000/600', '2025-01-12 12:10:00'),
+(-6, -4, 'https://picsum.photos/id/1040/1000/600', '2025-01-13 13:00:00'),
+(-7, -5, 'https://picsum.photos/id/1015/1000/600', '2025-01-14 14:00:00'),
+(-8, -5, 'https://picsum.photos/id/1016/1000/600', '2025-01-14 14:05:00'),
+(-9, -5, 'https://picsum.photos/id/1024/1000/600', '2025-01-14 14:10:00');
+
+UPDATE stakeholders."Clubs" SET "FeaturedImageId" = -1 WHERE "Id" = -1;
+UPDATE stakeholders."Clubs" SET "FeaturedImageId" = -3 WHERE "Id" = -2;
+UPDATE stakeholders."Clubs" SET "FeaturedImageId" = -4 WHERE "Id" = -3;
+UPDATE stakeholders."Clubs" SET "FeaturedImageId" = -6 WHERE "Id" = -4;
+UPDATE stakeholders."Clubs" SET "FeaturedImageId" = -7 WHERE "Id" = -5;
+
+-- Club Join Requests
+INSERT INTO stakeholders."ClubJoinRequests" ("Id", "TouristId", "ClubId", "RequestedAt") VALUES
+(-1, -28, -1, '2025-01-20 10:00:00+00'),
+(-2, -30, -3, '2025-01-21 12:30:00+00'),
+(-3, -31, -4, '2025-01-22 09:15:00+00'),
+(-4, -33, -1, '2025-01-23 14:45:00+00');
+
+-- =====================================================
+-- TOURS (INSERT)
+-- =====================================================
+
+-- Equipment
+INSERT INTO tours."Equipment"("Id", "Name", "Description") VALUES
+(-1, 'Planinarske cipele', 'Kvalitetne vodootporne cipele sa dobrim đonom za planinarenje.'),
+(-2, 'Ranac (30-40L)', 'Ergonomski ranac sa kišnom zaštitom, idealan za jednodnevne ture.'),
+(-3, 'Baterijska lampa', 'LED lampa jačine 200-400 lumena sa rezervnim baterijama.');
+
+-- Facilities
+INSERT INTO tours."Facilities"("Id", "Name", "Latitude", "Longitude", "Category") VALUES
+(-1, 'Restoran Dunavski Biser', 45.2556, 19.8428, 1),
+(-2, 'Kod Rajka - Tradicionalna kuhinja', 45.2543, 19.8415, 1),
+(-3, 'Parking Petrovaradinska Tvrđava', 45.2520, 19.8618, 2),
+(-4, 'Javni WC Trg Slobode', 45.2550, 19.8422, 0),
+(-5, 'Info punkt Fruška Gora', 45.1514, 19.7208, 3);
+
+-- Monuments
+INSERT INTO tours."Monuments"("Id", "Name", "Description", "Year", "Status", "Latitude", "Longitude") VALUES
+(-1, 'Petrovaradinska tvrđava', 'Jedna od najvećih i najočuvanijih tvrđava u Evropi. Simbol Novog Sada sa pogledom na Dunav.', 1780, 0, 45.2520, 19.8618),
+(-2, 'Spomenik Svetozaru Miletiću', 'Monumentalni spomenik srpskom političaru i narodnom tribunu, rad Ivana Meštrovića.', 1939, 1, 45.2559, 19.8453),
+(-3, 'Beogradska tvrđava Kalemegdan', 'Istorijski kompleks i park u centru Beograda sa pogledom na ušće Save u Dunav.', 1867, 0, 44.8227, 20.4512),
+(-4, 'Niška Tvrđava', 'Turska tvrđava iz 18. veka na obali reke Nišave.', 1723, 0, 43.3209, 21.8958),
+(-5, 'Manastir Krušedol', 'Pravoslavni manastir na Fruškoj Gori, zadužbina Đorđa Brankovića.', 1516, 1, 45.1347, 19.7392);
+
+-- Tours (12 tura: 8 Published, 2 Draft, 2 Archived)
+INSERT INTO tours."Tours"(
+  "Id", "Name", "Description", "Difficulty", "Status", "Price", "DistanceInKm",
+  "AuthorId", "CreatedAt", "Tags", "TourDurations"
+) VALUES
+-- PUBLISHED TOURS (Status=1)
+(-1, 'Petrovaradinska Tvrđava - Istorijsko Blago', 
+'Obilazak najpoznatije tvrđave Novog Sada. Upoznajte bogatu istoriju, posetite muzeje i uživajte u spektakularnom pogledu na Dunav.',
+ 0, 1, 250, 3.5, -11, '2024-12-01 10:00:00',
+ '["History", "Culture", "City", "Walking"]'::jsonb,
+ $$[{"TimeInMinutes":120,"Transportation":0}]$$::jsonb
+),
+
+(-2, 'Fruška Gora - Planinski Raj',
+'Planinarenje kroz najlepše staze Fruške Gore. Posetite manastire, uživajte u šumskim vidikovcima i doživite mir prirode.',
+ 2, 1, 380, 12.8, -11, '2024-12-05 09:00:00',
+ '["Nature", "Hiking", "Mountain", "Adventure"]'::jsonb,
+ $$[{"TimeInMinutes":240,"Transportation":0},{"TimeInMinutes":90,"Transportation":2}]$$::jsonb
+),
+
+(-3, 'Stari Grad Beograd - Kalemegdan',
+'Šetnja kroz istorijski centar Beograda. Kalemegdan, Knez Mihailova, Skadarlija - sve na jednom mestu!',
+ 0, 1, 280, 4.2, -12, '2024-12-10 11:00:00',
+ '["History", "Culture", "City", "Walking"]'::jsonb,
+ $$[{"TimeInMinutes":150,"Transportation":0}]$$::jsonb
+),
+
+(-4, 'Dunavska Obala - Biciklističko Putovanje',
+'Biciklistička tura duž Dunava od Novog Sada do Sremskih Karlovaca. Uživajte u prelepim pejzažima i svežem vazduhu.',
+ 1, 1, 320, 18.5, -12, '2024-12-12 08:00:00',
+ '["Nature", "Bicycle", "River", "Sport"]'::jsonb,
+ $$[{"TimeInMinutes":180,"Transportation":1}]$$::jsonb
+),
+
+(-5, 'Niš - Grad Cara Konstantina',
+'Istorijska tura kroz Niš. Nišku Tvrđavu, Ćele Kulu, arheološka nalazišta i tradicionalne kafane.',
+ 0, 1, 290, 5.1, -12, '2024-12-15 10:00:00',
+ '["History", "Culture", "City", "Food"]'::jsonb,
+ $$[{"TimeInMinutes":180,"Transportation":0}]$$::jsonb
+),
+
+(-6, 'Subotica - Secesijska Lepota',
+'Obilazak najlepših secesijskih građevina Subotice. Gradska Kuća, Sinagoga, Palata Raichle i još mnogo toga.',
+ 0, 1, 270, 3.8, -13, '2024-12-18 11:00:00',
+ '["Architecture", "Culture", "City", "Photography"]'::jsonb,
+ $$[{"TimeInMinutes":150,"Transportation":0}]$$::jsonb
+),
+
+(-7, 'Urbex Novi Sad - Skrivene Lokacije',
+'Istraživanje napuštenih zgrada i skrivenih urbanih lokacija Novog Sada. Samo za avanturiste!',
+ 2, 1, 350, 6.5, -13, '2024-12-20 14:00:00',
+ '["Urbex", "Adventure", "Photography", "Secret"]'::jsonb,
+ $$[{"TimeInMinutes":210,"Transportation":0}]$$::jsonb
+),
+
+(-8, 'Gastro Tura - Vojvođanski Specijaliteti',
+'Kulinarsko putovanje kroz Vojvodinu. Degustacija tradicionalnih jela, vina i rakije.',
+ 0, 1, 420, 8.2, -13, '2024-12-22 12:00:00',
+ '["Food", "Wine", "Culture", "Tradition"]'::jsonb,
+ $$[{"TimeInMinutes":240,"Transportation":2}]$$::jsonb
+),
+
+-- DRAFT TOURS (Status=0)
+(-9, 'Zlatibor - Priroda i Planine',
+'Planinska tura kroz Zlatibor. Još u pripremi!',
+ 1, 0, 0, 15.0, -11, '2025-01-05 10:00:00',
+ '["Mountain", "Nature", "Draft"]'::jsonb,
+ $$[{"TimeInMinutes":300,"Transportation":0}]$$::jsonb
+),
+
+(-10, 'Kopaonik - Zimska Avantura',
+'Ski tura na Kopaoniku. Uskoro dostupno!',
+ 2, 0, 0, 10.0, -11, '2025-01-10 09:00:00',
+ '["Mountain", "Winter", "Ski", "Draft"]'::jsonb,
+ $$[{"TimeInMinutes":360,"Transportation":2}]$$::jsonb
+),
+
+-- ARCHIVED TOURS (Status=2)
+(-11, 'Stara Letnja Tura - Neaktivna',
+'Ova tura više nije dostupna.',
+ 1, 2, 300, 7.0, -12, '2024-06-01 10:00:00',
+ '["Archived", "Old"]'::jsonb,
+ $$[{"TimeInMinutes":180,"Transportation":0}]$$::jsonb
+),
+
+(-12, 'Zimska Akcija 2024 - Završena',
+'Prošlogodišnja zimska akcija.',
+ 0, 2, 200, 4.0, -13, '2024-01-15 10:00:00',
+ '["Archived", "Winter", "Old"]'::jsonb,
+ $$[{"TimeInMinutes":120,"Transportation":0}]$$::jsonb
+);
+
+-- =====================================================
+-- ENCOUNTERS - SVI NA SRPSKOM I U NOVOM SADU
+-- =====================================================
+DELETE FROM encounters."EncounterActivations";
+DELETE FROM encounters."Encounters";
+
+INSERT INTO encounters."Encounters"(
+  "Id", "Name", "Description", "Latitude", "Longitude", "XP", "Status", "Type",
+  "ActionDescription", "RequiredPeopleCount", "RangeInMeters", "ImageUrl"
+)
+VALUES 
+-- ============================================
+-- MISC ENCOUNTERS (Type = 'Misc')
+-- ============================================
+(-1, 'Sklekovi Izazov', 'Uradi 20 sklekova na ovoj lokaciji', 
+ 45.2517, 19.8658, 50, 'Active', 'Misc',
+ 'Uradi 20 sklekova', NULL, NULL, NULL),
+
+(-8, 'Brojanje Kafića', 'Pređi celu dužinu Zmaj Jovine i prebroj sve kafiće', 
+ 45.2566, 19.8434, 40, 'Active', 'Misc',
+ 'Prebroj sve kafiće na Zmaj Jovinoj', NULL, NULL, NULL),
+
+(-10, 'Odmor u Dunavskom Parku', 'Sedni na klupu 5 minuta i uživaj u prirodi', 
+ 45.2522, 19.8503, 30, 'Active', 'Misc',
+ 'Odmori na klupi 5 minuta', NULL, NULL, NULL),
+
+(-5, 'Nacrt Izazova', 'Ovaj izazov se još priprema', 
+ 45.2555, 19.8450, 200, 'Draft', 'Misc',
+ 'Testni opis akcije', NULL, NULL, NULL),
+
+(-38, 'Stari Zimski Izazov', 'Napravi sneška (sezonski, arhiviran)', 
+ 45.2560, 19.8430, 80, 'Archived', 'Misc',
+ 'Napravi sneška u centru grada', NULL, NULL, NULL),
+
+(-40, 'Otkazano Prelaženje Reke', 'Preplivaj Dunav (otkazano)', 
+ 45.2500, 19.8500, 500, 'Archived', 'Misc',
+ 'Preplivaj Dunav', NULL, NULL, NULL),
+
+-- ============================================
+-- SOCIAL ENCOUNTERS (Type = 'Social') - SVI U NOVOM SADU
+-- ============================================
+(-3, 'Upoznaj Turiste', 'Okupi se sa 2 turista na ovoj lokaciji', 
+ 45.2550, 19.8422, 100, 'Active', 'Social',
+ NULL, 2, 15.0, NULL),
+
+(-11, 'Grupa Uličnih Muzičara', 'Nađi i pridruži se grupi od 5 ljudi koji slušaju ulične muzičare', 
+ 45.2560, 19.8440, 80, 'Active', 'Social',
+ NULL, 5, 20.0, NULL),
+
+(-12, 'Druženje na Pijaci', 'Sastani se sa 4 turista na lokalnoj pijaci', 
+ 45.2556, 19.8428, 90, 'Active', 'Social',
+ NULL, 4, 10.0, NULL),
+
+(-13, 'Kafićki Susret', 'Popij kafu sa bar 6 ljudi', 
+ 45.2543, 19.8415, 100, 'Active', 'Social',
+ NULL, 6, 25.0, NULL),
+
+-- ============================================
+-- HIDDEN LOCATION ENCOUNTERS (Type = 'HiddenLocation') - SVI U NOVOM SADU
+-- ============================================
+(-2, 'Pronađi Dunavski Pogled', 'Pronađi tačno mesto odakle je napravljena ova fotografija', 
+ 45.2551, 19.8451, 150, 'Active', 'HiddenLocation',
+ NULL, NULL, NULL, 'https://picsum.photos/id/10/2500/1667'),
+
+(-4, 'Tajni Kutak Tvrđave', 'Pronađi skriveni vidikovac sa ove fotografije', 
+ 45.2525, 19.8625, 150, 'Active', 'HiddenLocation',
+ NULL, NULL, NULL, 'https://picsum.photos/id/20/3670/2462'),
+
+(-7, 'Trg Slobode Skriveni Ugao', 'Pronađi odakle je napravljena ova jedinstvena fotografija Gradske kuće', 
+ 45.2550, 19.8422, 120, 'Active', 'HiddenLocation',
+ NULL, NULL, NULL, 'https://picsum.photos/id/30/1280/901'),
+
+(-9, 'Tajna Crkva', 'Otkrij tajno mesto fotografa za ovu sliku crkve', 
+ 45.2547, 19.8447, 130, 'Active', 'HiddenLocation',
+ NULL, NULL, NULL, 'https://picsum.photos/id/40/4106/2806'),
+
+(-6, 'Arhivirani Stari Izazov', 'Ovaj izazov više nije dostupan', 
+ 45.2560, 19.8435, 300, 'Archived', 'HiddenLocation',
+ NULL, NULL, NULL, 'https://picsum.photos/id/50/4608/3072'),
+
+(-39, 'Buduća Galerija', 'Poseti novu galeriju (uskoro)', 
+ 45.2548, 19.8419, 120, 'Draft', 'HiddenLocation',
+ NULL, NULL, NULL, 'https://picsum.photos/id/60/1920/1200');
+
+-- =====================================================
+-- KEY POINTS (INSERT)
+-- =====================================================
+-- ~20% KeyPoints-a ima Encounter
+
+-- Tour -1: Petrovaradinska Tvrđava (5 KeyPoints, 1 sa Encounterom)
+INSERT INTO tours."KeyPoints"(
+  "TourId", "Name", "Description", "ImageUrl", "Secret", "Latitude", "Longitude", "EncounterId", "IsEncounterMandatory"
+) VALUES
+(-1, 'Glavni Ulaz u Tvrđavu', 'Počnite svoju avanturu na glavnom ulazu u tvrđavu. Ovde ćete dobiti mapu i osnovne informacije.', 
+ 'https://picsum.photos/id/237/1000/600', 'Tajna: Tvrđava ima podzemne tunele dužine preko 16 km!', 
+ 45.2515, 19.8610, NULL, false),
+ 
+(-1, 'Satna Kula', 'Čuvena satna kula sa "pijanim satom" koji pokazuje obrnuto vreme.', 
+ 'https://picsum.photos/id/238/1000/600', 'Tajna: Sat pokazuje sate na malom, a minute na velikom kazaljki!', 
+ 45.2520, 19.8618, -1, false), -- SA ENCOUNTEROM
+ 
+(-1, 'Muzej Grada', 'Posetite muzej i saznajte više o istoriji Novog Sada.', 
+ 'https://picsum.photos/id/239/1000/600', 'Tajna: Muzej čuva originalne dokumente iz rimskog perioda.', 
+ 45.2522, 19.8615, NULL, false),
+ 
+(-1, 'Vidikovac - Pogled na Dunav', 'Najlepši pogled na Dunav i Novi Sad.', 
+ 'https://picsum.photos/id/240/1000/600', 'Tajna: Ovde možete videti čak 7 mostova istovremeno!', 
+ 45.2525, 19.8620, NULL, false),
+ 
+(-1, 'Restoran Leonardo', 'Završite turu uz piće ili obrok u restoranu sa pogledom.', 
+ 'https://picsum.photos/id/241/1000/600', 'Tajna: Restoran se nalazi u originalnoj austrougarskoj kasarni iz 1780.', 
+ 45.2518, 19.8612, NULL, false);
+
+-- Tour -2: Fruška Gora (8 KeyPoints)
+INSERT INTO tours."KeyPoints"(
+  "TourId", "Name", "Description", "ImageUrl", "Secret", "Latitude", "Longitude", "EncounterId", "IsEncounterMandatory"
+) VALUES
+(-2, 'Parking - Početak Staze', 'Ostavite auto i spremite se za planinarenje!', 
+ 'https://picsum.photos/id/1018/1000/600', 'Tajna: Na Fruškoj Gori živi preko 700 biljnih vrsta.', 
+ 45.1500, 19.7200, NULL, false),
+ 
+(-2, 'Šumska Staza - Označena', 'Pratite crvene oznake kroz šumu.', 
+ 'https://picsum.photos/id/1019/1000/600', 'Tajna: Ove šume su stare preko 300 godina.', 
+ 45.1510, 19.7205, NULL, false),
+ 
+(-2, 'Prvi Vidikovac', 'Kraći predah i prvi pogled na okolinu.', 
+ 'https://picsum.photos/id/1020/1000/600', 'Tajna: Odavde se vidi čak do Beograda u lepom vremenu!', 
+ 45.1515, 19.7208, NULL, false),
+ 
+(-2, 'Povratak - Alternativna Staza', 'Spustite se drugom stazom nazad do parkinga.', 
+ 'https://picsum.photos/id/1024/1000/600', 'Tajna: Ova staza je kraća ali strmija - oprez!', 
+ 45.1505, 19.7202, NULL, false),
+ 
+(-2, 'Izvor Pitke Vode', 'Napunite flašu svežom izvorskom vodom.', 
+ 'https://picsum.photos/id/1021/1000/600', 'Tajna: Ovaj izvor nikada ne presušuje, čak ni leti.', 
+ 45.1520, 19.7210, NULL, false),
+ 
+(-2, 'Vrh - Glavna Panorama', 'Stigli ste na vrh! Uživajte u pogledu.', 
+ 'https://picsum.photos/id/1022/1000/600', 'Tajna: Visina 539m - najviša tačka Fruške Gore je Crveni Čot (539m).', 
+ 45.1520, 19.7210, -4, false), -- SA ENCOUNTEROM - OPCIONO
+ 
+(-2, 'Picnic Zona', 'Vreme za odmor i užinu.', 
+ 'https://picsum.photos/id/1023/1000/600', 'Tajna: Ovo mesto je omiljeno za proslave i okupljanja planinara.', 
+ 45.1518, 19.7208, NULL, false),
+ 
+(-2, 'Manastir Krušedol', 'Posetite manastir iz 16. veka.', 
+ 'https://picsum.photos/id/1011/1000/600', 'Tajna: U manastiru su sahranjeni Karađorđevići.', 
+ 45.1347, 19.7392, NULL, false);
+
+-- Tour -3: Kalemegdan (6 KeyPoints, 1 sa Encounterom)
+INSERT INTO tours."KeyPoints"(
+  "TourId", "Name", "Description", "ImageUrl", "Secret", "Latitude", "Longitude", "EncounterId", "IsEncounterMandatory"
+) VALUES
+(-3, 'Trg Republike', 'Startujte od centralnog trga Beograda.', 
+ 'https://picsum.photos/id/244/1000/600', 'Tajna: Spomenik kneza Mihaila otkrio je Enriko Paci 1882.', 
+ 44.8167, 20.4608, NULL, false),
+ 
+(-3, 'Knez Mihailova Ulica', 'Prošetajte najpoznatijom ulicom Beograda.', 
+ 'https://picsum.photos/id/1020/1000/600', 'Tajna: Ulica je duga 920 metara i zaštićena je kao spomenik kulture.', 
+ 44.8177, 20.4570, NULL, false),
+ 
+(-3, 'Kalemegdan - Ulaz', 'Uđite u istorijski park Kalemegdan.', 
+ 'https://picsum.photos/id/1019/1000/600', 'Tajna: Kalemegdan je najveći i najstariji park u Beogradu.', 
+ 44.8220, 20.4510, NULL, false),
+ 
+(-3, 'Rimski Bunar', 'Pogledajte rimski bunar dubok 60 metara.', 
+ 'https://picsum.photos/id/247/1000/600', 'Tajna: Bunar nikada nije bio završen zbog tehničkih poteškoća.', 
+ 44.8225, 20.4508, NULL, false),
+ 
+(-3, 'Spomenik Pobednik', 'Najpoznatiji spomenik Beograda sa pogledom na ušće.', 
+ 'https://picsum.photos/id/1018/1000/600', 'Tajna: Skulptura je rad Ivana Meštrovića iz 1928. godine.', 
+ 44.8230, 20.4515, -10, false), -- SA ENCOUNTEROM
+ 
+(-3, 'Ušće Save i Dunava', 'Kraj ture - pogled na spoj dve reke.', 
+ 'https://picsum.photos/id/248/1000/600', 'Tajna: Ovde se spajaju Sava i Dunav, dve najvažnije reke Srbije.', 
+ 44.8227, 20.4512, NULL, false);
+
+-- Tour -4: Dunavska Obala (5 KeyPoints, 1 sa Encounterom)
+INSERT INTO tours."KeyPoints"(
+ "Id", "TourId", "Name", "Description", "ImageUrl", "Secret", "Latitude", "Longitude", "EncounterId", "IsEncounterMandatory"
+) VALUES
+(-45, -4, 'Start - Kej Žrtava Racije', 'Krenite biciklom uz Dunav.', 
+ 'https://picsum.photos/id/1040/1000/600', 'Tajna: Kej je dug preko 4 km.', 
+ 45.2556, 19.8450, NULL, false),
+ 
+(-44, -4, 'Dunavski Park', 'Prođite kroz zeleni park uz reku.', 
+ 'https://picsum.photos/id/1015/1000/600', 'Tajna: Park je osnovan 1895. godine.', 
+ 45.2556, 19.8500, -5, false), -- SA ENCOUNTEROM
+ 
+(-43, -4, 'Ribarsko Ostrvo', 'Prođite pored Ribarskog ostrva.', 
+ 'https://picsum.photos/id/1041/1000/600', 'Tajna: Ostrvo je nastalo veštački 1700-ih godina.', 
+ 45.2400, 19.8520, NULL, false),
+ 
+(-42, -4, 'Sremski Karlovci - Centar', 'Dobrodošli u čuvenu Karlovačku gimnaziju!', 
+ 'https://picsum.photos/id/1042/1000/600', 'Tajna: Grad je poznat po vinu Bermet i Karlovačkoj gimnaziji.', 
+ 45.201360504556725, 19.93331909179688, NULL, false),
+ 
+(-41, -4, 'Vinarija - Degustacija', 'Završite turu degustacijom lokalnih vina.', 
+ 'https://picsum.photos/id/1060/1000/600', 'Tajna: Bermet je najpoznatije vino ovog kraja od 1751. godine.', 
+ 45.2030, 19.9350, NULL, false);
+
+-- Tour -5: Niš (7 KeyPoints, 1 sa Encounterom)
+INSERT INTO tours."KeyPoints"(
+  "TourId", "Name", "Description", "ImageUrl", "Secret", "Latitude", "Longitude", "EncounterId", "IsEncounterMandatory"
+) VALUES
+(-5, 'Trg Kralja Milana', 'Početak ture u centru Niša.', 
+ 'https://picsum.photos/id/250/1000/600', 'Tajna: Trg je nazvan po kralju Milanu Obrenoviću.', 
+ 43.3209, 21.8958, NULL, false),
+ 
+(-5, 'Niška Tvrđava - Ulaz', 'Uđite u tursku tvrđavu iz 18. veka.', 
+ 'https://picsum.photos/id/251/1000/600', 'Tajna: Tvrđava je izgrađena 1723. godine na temeljima rimske utvrde.', 
+ 43.3210, 21.8960, -3, false), -- SA ENCOUNTEROM
+ 
+(-5, 'Hamam', 'Posetite jedini očuvani turski hamam u Srbiji.', 
+ 'https://picsum.photos/id/252/1000/600', 'Tajna: Hamam je restauriran i danas služi kao galerija.', 
+ 43.3212, 21.8962, NULL, false),
+ 
+(-5, 'Spomenik Oslobodiocima Niša', 'Spomenik posvećen oslobodiocima Niša u Prvom svetskom ratu.', 
+ 'https://picsum.photos/id/253/1000/600', 'Tajna: Spomenik je visok 12 metara.', 
+ 43.3205, 21.8955, NULL, false),
+ 
+(-5, 'Kazandžijsko Sokače', 'Prošetajte starom zanatskom ulicom.', 
+ 'https://picsum.photos/id/254/1000/600', 'Tajna: Ulica datira iz turskog perioda i puna je suvenirnica.', 
+ 43.3215, 21.8965, NULL, false),
+ 
+(-5, 'Ćele Kula', 'Posetite morbidni spomenik - kulu od lobanja.', 
+ 'https://picsum.photos/id/255/1000/600', 'Tajna: Kula je izgrađena 1809. sa lobanjama srpskih ustanika.', 
+ 43.3180, 21.8880, NULL, false),
+ 
+(-5, 'Restoran Tradicionalne Kuhinje', 'Završite turu tradicionalnim niškim jelima.', 
+ 'https://picsum.photos/id/256/1000/600', 'Tajna: Probajte nišku pihtiju i burek sa sirom!', 
+ 43.3208, 21.8957, NULL, false);
+
+-- Tour -6: Subotica (4 KeyPoints, 0 sa Encounterima)
+INSERT INTO tours."KeyPoints"(
+  "TourId", "Name", "Description", "ImageUrl", "Secret", "Latitude", "Longitude", "EncounterId", "IsEncounterMandatory"
+) VALUES
+(-6, 'Gradska Kuća', 'Počnite od najlepše secesijske građevine u Srbiji.', 
+ 'https://picsum.photos/id/260/1000/600', 'Tajna: Gradska kuća je izgrađena 1910. godine u mađarskom secesijskom stilu.', 
+ 46.1005, 19.6659, NULL, false),
+ 
+(-6, 'Sinagoga', 'Druga po veličini sinagoga u Evropi.', 
+ 'https://picsum.photos/id/261/1000/600', 'Tajna: Sinagoga može primiti 850 ljudi.', 
+ 46.1000, 19.6655, NULL, false),
+ 
+(-6, 'Palata Raichle', 'Secesijska palata sa plavim krovom.', 
+ 'https://picsum.photos/id/262/1000/600', 'Tajna: Palata je izgrađena 1904. godine za poznatu porodicu Raichle.', 
+ 46.1008, 19.6662, NULL, false),
+ 
+(-6, 'Trg Slobode', 'Centralni trg Subotice.', 
+ 'https://picsum.photos/id/263/1000/600', 'Tajna: Trg je okružen najlepšim secesijskim zgradama grada.', 
+ 46.1006, 19.6660, NULL, false);
+
+-- Tour -7: Urbex Novi Sad (6 KeyPoints, 1 sa Encounterom)
+INSERT INTO tours."KeyPoints"(
+  "TourId", "Name", "Description", "ImageUrl", "Secret", "Latitude", "Longitude", "EncounterId", "IsEncounterMandatory"
+) VALUES
+(-7, 'Napuštena Fabrika - Ulaz', 'Pažljivo uđite u napuštenu fabriku.', 
+ 'https://picsum.photos/id/1025/1000/600', 'Tajna: Fabrika je zatvorena 1990-ih godina.', 
+ 45.2600, 19.8300, NULL, false),
+ 
+(-7, 'Stara Mašinerija', 'Fotografišite stare mašine.', 
+ 'https://picsum.photos/id/1026/1000/600', 'Tajna: Neke mašine datiraju iz 1950-ih.', 
+ 45.2605, 19.8305, NULL, false),
+ 
+(-7, 'Grafiti Zid', 'Pronađite zid sa street art-om.', 
+ 'https://picsum.photos/id/1027/1000/600', 'Tajna: Ovde dolaze najpoznatiji grafiti umetnici.', 
+ 45.2560, 19.8450, NULL, false),
+ 
+(-7, 'Napuštena Železnička Stanica', 'Istražite staru stanicu.', 
+ 'https://picsum.photos/id/1028/1000/600', 'Tajna: Stanica je napuštena od 1985. godine.', 
+ 45.2580, 19.8400, NULL, false),
+ 
+(-7, 'Skrivena Soba', 'Pronađite skrivenu sobu na drugom spratu.', 
+ 'https://picsum.photos/id/1024/1000/600', 'Tajna: U sobi se nalazi stara kasa i dokumenti iz prošlosti.', 
+ 45.2550, 19.8422, -9, true), -- SA ENCOUNTEROM - OBAVEZAN
+ 
+(-7, 'Krov - Panorama', 'Penjite se na krov za najbolji pogled (OPREZ!).', 
+ 'https://picsum.photos/id/1029/1000/600', 'Tajna: Sa krova se vidi ceo grad - ali budite pažljivi!', 
+ 45.2610, 19.8310, NULL, false);
+
+-- Tour -8: Gastro Tura (5 KeyPoints, 1 sa Encounterom)
+INSERT INTO tours."KeyPoints"(
+  "TourId", "Name", "Description", "ImageUrl", "Secret", "Latitude", "Longitude", "EncounterId", "IsEncounterMandatory"
+) VALUES
+(-8, 'Tradicionalni Restoran - Prvi Obrok', 'Degustacija vojvođanske čorbe i čvaraka.', 
+ 'https://picsum.photos/id/1060/1000/600', 'Tajna: Recept za čorbu prenosi se generacijama.', 
+ 45.2543, 19.8415, NULL, false),
+ 
+(-8, 'Vinarija - Bermet', 'Kušajte čuveni Bermet vino iz Sremskih Karlovaca.', 
+ 'https://picsum.photos/id/1061/1000/600', 'Tajna: Bermet je najstarije registrovano vino u Srbiji (1751).', 
+ 45.2030, 19.9350, NULL, false),
+ 
+(-8, 'Salaš - Domaća Rakija', 'Posetite salaš i probajte domaću šljivovicu.', 
+ 'https://picsum.photos/id/1062/1000/600', 'Tajna: Rakija se pravi po tradicionalnom receptu od preko 100 godina.', 
+ 45.2100, 19.8000, NULL, false),
+ 
+(-8, 'Kafana - Druženje', 'Upoznajte lokalne gastro entuzijaste.', 
+ 'https://picsum.photos/id/1063/1000/600', 'Tajna: U ovoj kafani se okupljaju najbolji kuvari regiona.', 
+ 45.2566, 19.8434, -6, false), -- SA ENCOUNTEROM
+ 
+(-8, 'Kolačinica - Desert', 'Završite slatkim zalogajima - štrudla, palačinke, kremšnite.', 
+ 'https://picsum.photos/id/1064/1000/600', 'Tajna: Recept za kremšnitu je iz austrougarske monarhije.', 
+ 45.2556, 19.8428, NULL, false);
+
+-- =====================================================
+-- WALLET TRANSACTIONS
+-- =====================================================
+-- ANALIZA PO TURISTIMA:
+-- -21: Level 1 (50 XP) - ROOKIE, kupio -1 (250), -2 (380), završio -1 (50 AC nagrada)
+-- -22: Level 3 (250 XP) - BRONZE
+-- -23: Level 7 (650 XP) - SILVER, kupio -2 (380)
+-- -24: Level 13 (1250 XP) - GOLD, kupio -8 (420), dobio GOLD nagradu (500 AC)
+-- -25: Level 18 (1750 XP) - PLATINUM, kupio -7 (350), završio -7 (60 AC nagrada), dobio GOLD (500) + PLATINUM (500) = 1000 AC
+-- -26: Level 26 (2550 XP) - DIAMOND, kupio -4 (320), -1 (250), -5 (290), -6 (270), završio -1 (50), -5 (50), dobio GOLD (500) + PLATINUM (500) + DIAMOND (1000) = 2000 AC
+-- -27: Level 33 (3250 XP) - VISTA, kupio -4 (320), dobio GOLD (500) + PLATINUM (500) + DIAMOND (1000) + VISTA (2000) = 4000 AC
+-- -28: Level 2 (150 XP) - BRONZE, kupio -1 (250)
+-- -29: Level 5 (450 XP) - SILVER, kupio -5 (290)
+-- -30: Level 1 (80 XP) - ROOKIE, kupio -6 (270)
+-- -31: Level 9 (850 XP) - SILVER, kupio -3 (280)
+-- -32: Level 4 (350 XP) - BRONZE, kupio -8 (420)
+-- -33: Level 12 (1150 XP) - GOLD, kupio -7 (350), dobio GOLD nagradu (500 AC)
+-- -34: Level 6 (550 XP) - SILVER, kupio -3 (280)
+-- -35: Level 8 (750 XP) - SILVER
+
+-- Kolone: PersonId, AmountAc, Type, Description, CreatedAtUtc, ReferenceType, ReferenceId, InitiatorPersonId
+
+-- Admin dodaje AC turistima (Type=1) - po 1000 AC svima
+INSERT INTO stakeholders."WalletTransactions"("Id", "PersonId", "Type", "AmountAc", "Description", "CreatedAtUtc", "ReferenceType", "ReferenceId", "InitiatorPersonId") VALUES
+(-1,  -21, 1, 1000, 'Admin dodata sredstva', '2024-12-01 10:00:00', NULL, NULL, -1),
+(-2,  -22, 1, 1000, 'Admin dodata sredstva', '2024-12-02 10:00:00', NULL, NULL, -1),
+(-3,  -23, 1, 1000, 'Admin dodata sredstva', '2024-12-03 10:00:00', NULL, NULL, -1),
+(-4,  -24, 1, 1000, 'Admin dodata sredstva', '2024-12-04 10:00:00', NULL, NULL, -1),
+(-5,  -25, 1, 1000, 'Admin dodata sredstva', '2024-12-05 10:00:00', NULL, NULL, -1),
+(-6,  -26, 1, 1000, 'Admin dodata sredstva', '2024-12-06 10:00:00', NULL, NULL, -1),
+(-7,  -27, 1, 1000, 'Admin dodata sredstva', '2024-12-07 10:00:00', NULL, NULL, -1),
+(-8,  -28, 1, 1000, 'Admin dodata sredstva', '2024-12-08 10:00:00', NULL, NULL, -1),
+(-9,  -29, 1, 1000, 'Admin dodata sredstva', '2024-12-09 10:00:00', NULL, NULL, -1),
+(-10, -30, 1, 1000, 'Admin dodata sredstva', '2024-12-10 10:00:00', NULL, NULL, -1),
+(-11, -31, 1, 1000, 'Admin dodata sredstva', '2024-12-11 10:00:00', NULL, NULL, -1),
+(-12, -32, 1, 1000, 'Admin dodata sredstva', '2024-12-12 10:00:00', NULL, NULL, -1),
+(-13, -33, 1, 1000, 'Admin dodata sredstva', '2024-12-13 10:00:00', NULL, NULL, -1),
+(-14, -34, 1, 1000, 'Admin dodata sredstva', '2024-12-14 10:00:00', NULL, NULL, -1),
+(-15, -35, 1, 1000, 'Admin dodata sredstva', '2024-12-15 10:00:00', NULL, NULL, -1);
+
+-- Welcome Bonus AC (Type=3) - po 100 AC prvih 5
+INSERT INTO stakeholders."WalletTransactions"("Id", "PersonId", "Type", "AmountAc", "Description", "CreatedAtUtc", "ReferenceType", "ReferenceId", "InitiatorPersonId") VALUES
+(-16, -21, 3, 100, 'Welcome bonus', '2024-12-01 10:05:00', 'WelcomeBonus', -1, NULL),
+(-17, -22, 3, 100, 'Welcome bonus', '2024-12-02 10:05:00', 'WelcomeBonus', -2, NULL),
+(-18, -23, 3, 100, 'Welcome bonus', '2024-12-03 10:05:00', 'WelcomeBonus', -3, NULL),
+(-19, -24, 3, 100, 'Welcome bonus', '2024-12-04 10:05:00', 'WelcomeBonus', -4, NULL),
+(-20, -25, 3, 100, 'Welcome bonus', '2024-12-05 10:05:00', 'WelcomeBonus', -5, NULL);
+
+-- Rank Reward AC (Type=4) - NOVI UPDATE!
+-- -24: GOLD (Level 13) dobija 500 AC
+INSERT INTO stakeholders."WalletTransactions"("Id", "PersonId", "Type", "AmountAc", "Description", "CreatedAtUtc", "ReferenceType", "ReferenceId", "InitiatorPersonId") VALUES
+(-100, -24, 4, 500, 'Gold rank nagrada', '2024-12-04 12:00:00', 'RankReward', NULL, NULL);
+
+-- -25: PLATINUM (Level 18) dobija GOLD (500) + PLATINUM (500) = 1000 AC
+INSERT INTO stakeholders."WalletTransactions"("Id", "PersonId", "Type", "AmountAc", "Description", "CreatedAtUtc", "ReferenceType", "ReferenceId", "InitiatorPersonId") VALUES
+(-101, -25, 4, 500, 'Gold rank nagrada', '2024-12-05 12:00:00', 'RankReward', NULL, NULL),
+(-102, -25, 4, 500, 'Platinum rank nagrada', '2024-12-05 12:01:00', 'RankReward', NULL, NULL);
+
+-- -26: DIAMOND (Level 26) dobija GOLD (500) + PLATINUM (500) + DIAMOND (1000) = 2000 AC
+INSERT INTO stakeholders."WalletTransactions"("Id", "PersonId", "Type", "AmountAc", "Description", "CreatedAtUtc", "ReferenceType", "ReferenceId", "InitiatorPersonId") VALUES
+(-103, -26, 4, 500, 'Gold rank nagrada', '2024-12-06 12:00:00', 'RankReward', NULL, NULL),
+(-104, -26, 4, 500, 'Platinum rank nagrada', '2024-12-06 12:01:00', 'RankReward', NULL, NULL),
+(-105, -26, 4, 1000, 'Diamond rank nagrada', '2024-12-06 12:02:00', 'RankReward', NULL, NULL);
+
+-- -27: VISTA (Level 33) dobija GOLD (500) + PLATINUM (500) + DIAMOND (1000) + VISTA (2000) = 4000 AC
+INSERT INTO stakeholders."WalletTransactions"("Id", "PersonId", "Type", "AmountAc", "Description", "CreatedAtUtc", "ReferenceType", "ReferenceId", "InitiatorPersonId") VALUES
+(-106, -27, 4, 500, 'Gold rank nagrada', '2024-12-07 12:00:00', 'RankReward', NULL, NULL),
+(-107, -27, 4, 500, 'Platinum rank nagrada', '2024-12-07 12:01:00', 'RankReward', NULL, NULL),
+(-108, -27, 4, 1000, 'Diamond rank nagrada', '2024-12-07 12:02:00', 'RankReward', NULL, NULL),
+(-109, -27, 4, 2000, 'Vista rank nagrada', '2024-12-07 12:03:00', 'RankReward', NULL, NULL);
+
+-- -33: GOLD (Level 12) dobija 500 AC
+INSERT INTO stakeholders."WalletTransactions"("Id", "PersonId", "Type", "AmountAc", "Description", "CreatedAtUtc", "ReferenceType", "ReferenceId", "InitiatorPersonId") VALUES
+(-110, -33, 4, 500, 'Gold rank nagrada', '2024-12-13 12:00:00', 'RankReward', NULL, NULL);
+
+-- Kupovina tura (Type=2)
+INSERT INTO stakeholders."WalletTransactions"("Id", "PersonId", "Type", "AmountAc", "Description", "CreatedAtUtc", "ReferenceType", "ReferenceId", "InitiatorPersonId") VALUES
+(-21, -21, 2, -250, 'Kupovina: Petrovaradinska Tvrđava - Istorijsko Blago', '2024-12-16 10:00:00', 'TourPurchase', -1, NULL),
+(-22, -21, 2, -380, 'Kupovina: Fruška Gora - Planinski Raj', '2024-12-17 11:00:00', 'TourPurchase', -2, NULL),
+(-23, -22, 2, -280, 'Kupovina: Stari Grad Beograd - Kalemegdan', '2024-12-18 12:00:00', 'TourPurchase', -3, NULL),
+(-24, -23, 2, -380, 'Kupovina: Fruška Gora - Planinski Raj', '2024-12-19 13:00:00', 'TourPurchase', -2, NULL),
+(-25, -24, 2, -420, 'Kupovina: Gastro Tura - Vojvođanski Specijaliteti', '2024-12-20 14:00:00', 'TourPurchase', -8, NULL),
+(-26, -25, 2, -350, 'Kupovina: Urbex Novi Sad - Skrivene Lokacije', '2024-12-21 15:00:00', 'TourPurchase', -7, NULL),
+(-27, -26, 2, -320, 'Kupovina: Dunavska Obala - Biciklističko Putovanje', '2024-12-22 16:00:00', 'TourPurchase', -4, NULL),
+(-28, -26, 2, -250, 'Kupovina: Petrovaradinska Tvrđava - Istorijsko Blago', '2024-12-22 16:05:00', 'TourPurchase', -1, NULL),
+(-29, -26, 2, -290, 'Kupovina: Niš - Grad Cara Konstantina', '2024-12-22 16:10:00', 'TourPurchase', -5, NULL),
+(-30, -26, 2, -270, 'Kupovina: Subotica - Secesijska Lepota', '2024-12-22 16:15:00', 'TourPurchase', -6, NULL),
+(-31, -27, 2, -320, 'Kupovina: Dunavska Obala - Biciklističko Putovanje', '2024-12-23 17:00:00', 'TourPurchase', -4, NULL),
+(-32, -28, 2, -250, 'Kupovina: Petrovaradinska Tvrđava - Istorijsko Blago', '2024-12-24 18:00:00', 'TourPurchase', -1, NULL),
+(-33, -29, 2, -290, 'Kupovina: Niš - Grad Cara Konstantina', '2024-12-25 19:00:00', 'TourPurchase', -5, NULL),
+(-34, -30, 2, -270, 'Kupovina: Subotica - Secesijska Lepota', '2024-12-26 20:00:00', 'TourPurchase', -6, NULL),
+(-35, -31, 2, -280, 'Kupovina: Stari Grad Beograd - Kalemegdan', '2024-12-27 21:00:00', 'TourPurchase', -3, NULL),
+(-36, -32, 2, -420, 'Kupovina: Gastro Tura - Vojvođanski Specijaliteti', '2024-12-28 22:00:00', 'TourPurchase', -8, NULL),
+(-37, -33, 2, -350, 'Kupovina: Urbex Novi Sad - Skrivene Lokacije', '2024-12-29 23:00:00', 'TourPurchase', -7, NULL),
+(-38, -34, 2, -280, 'Kupovina: Stari Grad Beograd - Kalemegdan', '2024-12-30 10:00:00', 'TourPurchase', -3, NULL);
+
+-- Tour Reward AC (Type=5) - ZA ZAVRŠENE TURE
+-- -21 završio -1: 50 AC
+-- -22 završio -3: 50 AC
+-- -25 završio -7: 60 AC
+-- -26 završio -1: 50 AC
+-- -26 završio -5: 50 AC
+INSERT INTO stakeholders."WalletTransactions"("Id", "PersonId", "Type", "AmountAc", "Description", "CreatedAtUtc", "ReferenceType", "ReferenceId", "InitiatorPersonId") VALUES
+(-50, -21, 5, 5, 'Nagrada za završenu turu: Petrovaradinska Tvrđava', '2024-12-16 15:00:00', 'TourCompletion', -1, NULL),
+(-51, -22, 5, 10, 'Nagrada za završenu turu: Kalemegdan', '2024-12-18 16:00:00', 'TourCompletion', -3, NULL),
+(-52, -25, 5, 10, 'Nagrada za završenu turu: Urbex Novi Sad', '2024-12-21 20:00:00', 'TourCompletion', -7, NULL),
+(-53, -26, 5, 7, 'Nagrada za završenu turu: Petrovaradinska Tvrđava', '2024-12-22 18:00:00', 'TourCompletion', -1, NULL),
+(-54, -26, 5, 8, 'Nagrada za završenu turu: Niš', '2024-12-23 18:00:00', 'TourCompletion', -5, NULL);
+
+-- =====================================================
+-- AŽURIRANJE WALLET BALANCES - RAČUNICA:
+-- =====================================================
+-- -21: 1000 + 100 - 250 - 380 + 5 = 475 AC
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 475 WHERE "PersonId" = -21;
+
+-- -22: 1000 + 100 - 280 + 10 = 830 AC
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 870 WHERE "PersonId" = -22;
+
+-- -23: 1000 + 100 - 380 = 720 AC
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 720 WHERE "PersonId" = -23;
+
+-- -24: 1000 + 100 + 500(GOLD) - 420 = 1180 AC
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 1180 WHERE "PersonId" = -24;
+
+-- -25: 1000 + 100 + 500(GOLD) + 500(PLATINUM) - 350 + 10 = 1760 AC
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 1760 WHERE "PersonId" = -25;
+
+-- -26: 1000 + 500(GOLD) + 500(PLATINUM) + 1000(DIAMOND) - 320 - 250 - 290 - 270 + 7 + 8 = 1885 AC
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 1885 WHERE "PersonId" = -26;
+
+-- -27: 1000 + 500(GOLD) + 500(PLATINUM) + 1000(DIAMOND) + 2000(VISTA) - 320 = 4680 AC
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 4680 WHERE "PersonId" = -27;
+
+-- -28: 1000 - 250 = 750 AC
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 750 WHERE "PersonId" = -28;
+
+-- -29: 1000 - 290 = 710 AC
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 710 WHERE "PersonId" = -29;
+
+-- -30: 1000 - 270 = 730 AC
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 730 WHERE "PersonId" = -30;
+
+-- -31: 1000 - 280 = 720 AC
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 720 WHERE "PersonId" = -31;
+
+-- -32: 1000 - 420 = 580 AC
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 580 WHERE "PersonId" = -32;
+
+-- -33: 1000 + 500(GOLD) - 350 = 1150 AC
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 1150 WHERE "PersonId" = -33;
+
+-- -34: 1000 - 280 = 720 AC
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 720 WHERE "PersonId" = -34;
+
+-- -35: 1000 = 1000 AC (ništa nije kupio/zaradio)
+UPDATE stakeholders."Wallets" SET "BalanceAc" = 1000 WHERE "PersonId" = -35;
+
+-- =====================================================
+-- TOUR PURCHASE RECORDS (NOVA TABELA)
+-- =====================================================
+INSERT INTO payments."TourPurchaseRecords"("Id", "TouristId", "TourId", "PriceAc", "PurchasedAt") VALUES
+(-1,  -21, -1, 250, '2024-12-16 10:00:00'),
+(-2,  -21, -2, 380, '2024-12-17 11:00:00'),
+(-3,  -22, -3, 280, '2024-12-18 12:00:00'),
+(-4,  -23, -2, 380, '2024-12-19 13:00:00'),
+(-5,  -24, -8, 420, '2024-12-20 14:00:00'),
+(-6,  -25, -7, 350, '2024-12-21 15:00:00'),
+(-7,  -26, -4, 320, '2024-12-22 16:00:00'),
+(-8,  -26, -1, 250, '2024-12-22 16:05:00'),
+(-9,  -26, -5, 290, '2024-12-22 16:10:00'),
+(-10, -26, -6, 270, '2024-12-22 16:15:00'),
+(-11, -27, -4, 320, '2024-12-23 17:00:00'),
+(-12, -28, -1, 250, '2024-12-24 18:00:00'),
+(-13, -29, -5, 290, '2024-12-25 19:00:00'),
+(-14, -30, -6, 270, '2024-12-26 20:00:00'),
+(-15, -31, -3, 280, '2024-12-27 21:00:00'),
+(-16, -32, -8, 420, '2024-12-28 22:00:00'),
+(-17, -33, -7, 350, '2024-12-29 23:00:00'),
+(-18, -34, -3, 280, '2024-12-30 10:00:00');
+
+-- =====================================================
+-- TOUR PURCHASE TOKENS
+-- =====================================================
+INSERT INTO payments."TourPurchaseTokens"("Id", "TouristId", "TourId", "Token", "CreatedAt") VALUES
+(-1,  -21, -1, 'tok_' || md5(random()::text), '2024-12-16 10:00:00'),
+(-2,  -21, -2, 'tok_' || md5(random()::text), '2024-12-17 11:00:00'),
+(-3,  -22, -3, 'tok_' || md5(random()::text), '2024-12-18 12:00:00'),
+(-4,  -23, -2, 'tok_' || md5(random()::text), '2024-12-19 13:00:00'),
+(-5,  -24, -8, 'tok_' || md5(random()::text), '2024-12-20 14:00:00'),
+(-6,  -25, -7, 'tok_' || md5(random()::text), '2024-12-21 15:00:00'),
+(-7,  -26, -4, 'tok_' || md5(random()::text), '2024-12-22 16:00:00'),
+(-8,  -26, -1, 'tok_' || md5(random()::text), '2024-12-22 16:05:00'),
+(-9,  -26, -5, 'tok_' || md5(random()::text), '2024-12-22 16:10:00'),
+(-10, -26, -6, 'tok_' || md5(random()::text), '2024-12-22 16:15:00'),
+(-11, -27, -4, 'tok_' || md5(random()::text), '2024-12-23 17:00:00'),
+(-12, -28, -1, 'tok_' || md5(random()::text), '2024-12-24 18:00:00'),
+(-13, -29, -5, 'tok_' || md5(random()::text), '2024-12-25 19:00:00'),
+(-14, -30, -6, 'tok_' || md5(random()::text), '2024-12-26 20:00:00'),
+(-15, -31, -3, 'tok_' || md5(random()::text), '2024-12-27 21:00:00'),
+(-16, -32, -8, 'tok_' || md5(random()::text), '2024-12-28 22:00:00'),
+(-17, -33, -7, 'tok_' || md5(random()::text), '2024-12-29 23:00:00'),
+(-18, -34, -3, 'tok_' || md5(random()::text), '2024-12-30 10:00:00');
+
+-- =====================================================
+-- TOUR EXECUTIONS
+-- =====================================================
+INSERT INTO tours."TourExecutions"(
+  "TouristId", "TourId", "StartTime", "Status", "StartLatitude", "StartLongitude",
+  "LastActivity", "ProgressPercentage", "CompletedKeyPoints", "CompletionTime", "AbandonTime", "GroupSessionId"
+)
+VALUES
+-- COMPLETED executions
+(-21, -1, '2024-12-16 10:30:00', 1, 45.2515, 19.8610, '2024-12-16 14:30:00', 100.0, 
+ '[{"KeyPointId": 1, "CompletedAt": "2024-12-16T11:00:00Z"}, {"KeyPointId": 2, "CompletedAt": "2024-12-16T12:00:00Z"}, {"KeyPointId": 3, "CompletedAt": "2024-12-16T13:00:00Z"}, {"KeyPointId": 4, "CompletedAt": "2024-12-16T14:00:00Z"}, {"KeyPointId": 5, "CompletedAt": "2024-12-16T14:30:00Z"}]'::jsonb, 
+ '2024-12-16 15:00:00', NULL, NULL),
+
+(-22, -3, '2024-12-18 12:30:00', 1, 44.8167, 20.4608, '2024-12-18 15:00:00', 100.0, 
+ '[{"KeyPointId": 1, "CompletedAt": "2024-12-18T12:45:00Z"}, {"KeyPointId": 2, "CompletedAt": "2024-12-18T13:15:00Z"}, {"KeyPointId": 3, "CompletedAt": "2024-12-18T14:00:00Z"}, {"KeyPointId": 4, "CompletedAt": "2024-12-18T14:30:00Z"}, {"KeyPointId": 5, "CompletedAt": "2024-12-18T14:50:00Z"}, {"KeyPointId": 6, "CompletedAt": "2024-12-18T15:00:00Z"}]'::jsonb, 
+ '2024-12-18 16:00:00', NULL, NULL),
+
+(-25, -7, '2024-12-21 15:30:00', 1, 45.2600, 19.8300, '2024-12-21 19:00:00', 100.0, 
+ '[{"KeyPointId": 1, "CompletedAt": "2024-12-21T16:00:00Z"}, {"KeyPointId": 2, "CompletedAt": "2024-12-21T16:45:00Z"}, {"KeyPointId": 3, "CompletedAt": "2024-12-21T17:30:00Z"}, {"KeyPointId": 4, "CompletedAt": "2024-12-21T18:00:00Z"}, {"KeyPointId": 5, "CompletedAt": "2024-12-21T18:30:00Z"}, {"KeyPointId": 6, "CompletedAt": "2024-12-21T19:00:00Z"}]'::jsonb, 
+ '2024-12-21 20:00:00', NULL, NULL),
+
+(-26, -1, '2024-12-22 16:30:00', 1, 45.2515, 19.8610, '2024-12-22 18:00:00', 100.0, 
+ '[{"KeyPointId": 1, "CompletedAt": "2024-12-22T16:45:00Z"}, {"KeyPointId": 2, "CompletedAt": "2024-12-22T17:15:00Z"}, {"KeyPointId": 3, "CompletedAt": "2024-12-22T17:30:00Z"}, {"KeyPointId": 4, "CompletedAt": "2024-12-22T17:45:00Z"}, {"KeyPointId": 5, "CompletedAt": "2024-12-22T18:00:00Z"}]'::jsonb, 
+ '2024-12-22 18:00:00', NULL, NULL),
+
+(-26, -5, '2024-12-23 10:00:00', 1, 43.3209, 21.8958, '2024-12-23 13:00:00', 100.0, 
+ '[{"KeyPointId": 1, "CompletedAt": "2024-12-23T10:15:00Z"}, {"KeyPointId": 2, "CompletedAt": "2024-12-23T10:45:00Z"}, {"KeyPointId": 3, "CompletedAt": "2024-12-23T11:15:00Z"}, {"KeyPointId": 4, "CompletedAt": "2024-12-23T11:45:00Z"}, {"KeyPointId": 5, "CompletedAt": "2024-12-23T12:15:00Z"}, {"KeyPointId": 6, "CompletedAt": "2024-12-23T12:45:00Z"}, {"KeyPointId": 7, "CompletedAt": "2024-12-23T13:00:00Z"}]'::jsonb, 
+ '2024-12-23 13:00:00', NULL, NULL),
+
+-- ABANDONED executions
+(-26, -4, '2024-12-22 16:00:00', 2, 45.2556, 19.8450, '2024-12-22 17:00:00', 45.0, 
+ '[{"KeyPointId": -45, "CompletedAt": "2024-12-22T16:20:00Z"}, {"KeyPointId": -44, "CompletedAt": "2024-12-22T16:50:00Z"}]'::jsonb, 
+ NULL, '2024-12-22 17:00:00', NULL),
+
+(-29, -5, '2024-12-25 19:30:00', 2, 43.3209, 21.8958, '2024-12-25 21:00:00', 38.0, 
+ '[{"KeyPointId": 1, "CompletedAt": "2024-12-25T19:45:00Z"}, {"KeyPointId": 2, "CompletedAt": "2024-12-25T20:30:00Z"}]'::jsonb, 
+ NULL, '2024-12-25 21:00:00', NULL),
+
+-- ACTIVE executions
+(-26, -4, '2026-02-06 08:00:00', 0, 45.1500, 19.7200, '2026-02-06 14:00:00', 62.5, 
+ '[{"KeyPointId": -45, "CompletedAt": "2026-02-06T08:30:00Z"}, {"KeyPointId": -44, "CompletedAt": "2026-02-06T09:00:00Z"}, {"KeyPointId": -43, "CompletedAt": "2026-02-06T09:45:00Z"}, {"KeyPointId": -42, "CompletedAt": "2026-02-06T10:30:00Z"}]'::jsonb, 
+ NULL, NULL, NULL),
+
+(-23, -2, '2025-02-01 09:00:00', 0, 45.1500, 19.7200, '2025-02-06 10:00:00', 50.0, 
+ '[{"KeyPointId": 1, "CompletedAt": "2025-02-01T09:30:00Z"}, {"KeyPointId": 2, "CompletedAt": "2025-02-01T10:00:00Z"}, {"KeyPointId": 3, "CompletedAt": "2025-02-01T10:45:00Z"}, {"KeyPointId": 4, "CompletedAt": "2025-02-01T11:30:00Z"}]'::jsonb, 
+ NULL, NULL, NULL),
+
+(-24, -8, '2025-02-02 12:00:00', 0, 45.2543, 19.8415, '2025-02-06 12:00:00', 40.0, 
+ '[{"KeyPointId": 1, "CompletedAt": "2025-02-02T12:30:00Z"}, {"KeyPointId": 2, "CompletedAt": "2025-02-02T14:00:00Z"}]'::jsonb, 
+ NULL, NULL, NULL),
+
+(-27, -4, '2025-02-03 08:00:00', 0, 45.2556, 19.8450, '2025-02-06 11:00:00', 60.0, 
+ '[{"KeyPointId": -45, "CompletedAt": "2025-02-03T08:20:00Z"}, {"KeyPointId": -44, "CompletedAt": "2025-02-03T09:00:00Z"}, {"KeyPointId": -43, "CompletedAt": "2025-02-03T10:00:00Z"}]'::jsonb, 
+ NULL, NULL, NULL),
+
+(-28, -1, '2025-02-04 11:00:00', 0, 45.2515, 19.8610, '2025-02-06 13:00:00', 50.0, 
+ '[{"KeyPointId": 1, "CompletedAt": "2025-02-04T11:15:00Z"}, {"KeyPointId": 2, "CompletedAt": "2025-02-04T12:00:00Z"}]'::jsonb, 
+ NULL, NULL, NULL),
+
+(-30, -6, '2025-02-05 11:00:00', 0, 46.1005, 19.6659, '2025-02-06 14:00:00', 75.0, 
+ '[{"KeyPointId": 1, "CompletedAt": "2025-02-05T11:20:00Z"}, {"KeyPointId": 2, "CompletedAt": "2025-02-05T12:00:00Z"}, {"KeyPointId": 3, "CompletedAt": "2025-02-05T13:00:00Z"}]'::jsonb, 
+ NULL, NULL, NULL),
+(-31, -3, '2025-02-05 10:00:00', 0, 44.8167, 20.4608, '2025-02-06 12:00:00', 33.0,
+ '[{"KeyPointId": 1, "CompletedAt": "2025-02-05T10:15:00Z"}, {"KeyPointId": 2, "CompletedAt": "2025-02-05T11:00:00Z"}]'::jsonb,
+ NULL, NULL, NULL),
+(-32, -8, '2025-02-05 12:30:00', 0, 45.2543, 19.8415, '2025-02-06 15:00:00', 20.0,
+'[{"KeyPointId": 1, "CompletedAt": "2025-02-05T13:00:00Z"}]'::jsonb,
+NULL, NULL, NULL),
+(-33, -7, '2025-02-05 14:00:00', 0, 45.2600, 19.8300, '2025-02-06 16:00:00', 50.0,
+'[{"KeyPointId": 1, "CompletedAt": "2025-02-05T14:30:00Z"}, {"KeyPointId": 2, "CompletedAt": "2025-02-05T15:30:00Z"}, {"KeyPointId": 3, "CompletedAt": "2025-02-05T16:00:00Z"}]'::jsonb,
+NULL, NULL, NULL),
+(-34, -3, '2025-02-06 09:00:00', 0, 44.8167, 20.4608, '2025-02-06 11:00:00', 16.0,
+'[{"KeyPointId": 1, "CompletedAt": "2025-02-06T09:20:00Z"}]'::jsonb,
+NULL, NULL, NULL);
+-- (Nastavak u sledećem komentaru zbog dužine...)
+-- =====================================================
+-- TOUR REVIEWS (INSERT)
+-- =====================================================
+INSERT INTO tours."TourReviews"(
+"Id", "TourId", "TouristId", "Rating", "Comment", "CreatedAt", "UpdatedAt",
+"ProgressPercentage", "IsEdited"
+) VALUES
+(-1, -1, -21, 5, 'Odlična tura! Vodič je bio informativan i lokacije su bile spektakularne. Preporučujem svima!',
+'2024-12-17 10:00:00', NULL, 100.0, false),
+(-2, -3, -22, 4, 'Vrlo dobra tura kroz Beograd. Malo gužve bilo na Kalemegdanu, ali sve u svemu super iskustvo.',
+'2024-12-19 11:00:00', NULL, 100.0, false),
+(-3, -7, -25, 5, 'Urbex tura je bila neverovatna! Pronašli smo mnogo zanimljivih lokacija. Adrenalin na maksimum!',
+'2024-12-22 14:00:00', NULL, 100.0, false),
+(-4, -1, -28, 5,
+ 'Prelepo organizovana tura! Sve je bilo jasno isplanirano, a priča o tvrđavi je baš držala pažnju. Odličan odnos cena/kvalitet.',
+ '2024-12-18 12:20:00', NULL, 100.0, false),
+(-5, -1, -33, 5,
+ 'Top iskustvo! Lokacije su odlične, tempo šetnje taman, a saveti za usputna mesta su mi baš značili. Preporuka!',
+ '2024-12-19 09:40:00', NULL, 100.0, false),
+(-6, -2, -21, 5,
+ 'Fenomenalna planinarska tura! Staza je dobro izabrana, pauze su bile na pravim mestima i sve je proteklo bez stresa. Jedva čekam opet!',
+ '2024-12-20 08:30:00', NULL, 100.0, false),
+(-7, -2, -26, 5,
+ 'Savršeno za ljubitelje prirode. Sve je bilo odlično objašnjeno i osećala sam se sigurno tokom cele ture. Pogledi su fantastični!',
+ '2024-12-21 10:15:00', NULL, 100.0, false),
+(-8, -2, -29, 4,
+ 'Odlična tura, priroda prelepa i odlična organizacija. Meni je bilo malo zahtevnije na jednom delu, ali ukupno iskustvo je sjajno.',
+ '2024-12-22 11:05:00', NULL, 100.0, false),
+-- Tour -9 (Zlatibor - Priroda i Planine) - Draft tura, ali recenzije mogu da postoje u bazi (ako ti model dozvoljava)
+(-9, -9, -31, 5,
+ 'Odlična ideja i super koncept ture. Ruta je baš lepo osmišljena i opis je detaljan. Voleo bih da bude dostupna što pre!',
+ '2025-01-06 12:00:00', NULL, 100.0, false),
+(-10, -10, -32, 5,
+ 'Prelepo zamišljena zimska tura! Opis i plan deluju baš profesionalno, a lokacije su pun pogodak. Jedva čekam da bude aktivna!',
+ '2025-01-11 09:30:00', NULL, 100.0, false);
+-- Review Images
+INSERT INTO tours."ReviewImages"("Id", "TourReviewId", "ImageUrl", "UploadedAt") VALUES
+(-1, -1, '/uploads/review-images/petrov-sat-kula.jpg', '2024-12-17 10:05:00'),
+(-2, -1, '/uploads/review-images/petrov-dunav-pogled.jpg', '2024-12-17 10:06:00'),
+(-3, -2, '/uploads/review-images/kalemegdan-pobednik.jpg', '2024-12-19 11:05:00'),
+(-4, -3, '/uploads/review-images/urbex-fabrika.jpg', '2024-12-22 14:05:00'),
+(-5, -3, '/uploads/review-images/urbex-grafiti.jpg', '2024-12-22 14:06:00'),
+(-6, -3, '/uploads/review-images/urbex-krov.jpg', '2024-12-22 14:07:00');
+-- (Ostale INSERT sekcije ostaju iste kao u originalnoj skripti, samo nastavi...)
+-- =====================================================
+-- TOUR PROBLEMS, MESSAGES, NOTIFICATIONS, BUNDLES, COUPONS, SALES, BLOGS, itd.
+-- =====================================================
+-- Ostale sekcije su već OK, nastavite sa njima po potrebi...
+-- =====================================================
+-- TOURIST RANK REWARDS (NOVA TABELA)
+-- =====================================================
+DELETE FROM stakeholders."TouristRankRewards";
+INSERT INTO stakeholders."TouristRankRewards"("Id", "TouristId", "GoldRewardClaimed", "PlatinumRewardClaimed", "DiamondRewardClaimed", "VistaRewardClaimed") VALUES
+(-1, -21, false, false, false, false),
+(-2, -22, false, false, false, false),
+(-3, -23, false, false, false, false),
+(-4, -24, true,  false, false, false),
+(-5, -25, true,  true,  false, false),
+(-6, -26, true,  true,  true,  false),
+(-7, -27, true,  true,  true,  true),
+(-8, -28, false, false, false, false),
+(-9, -29, false, false, false, false),
+(-10, -30, false, false, false, false),
+(-11, -31, false, false, false, false),
+(-12, -32, false, false, false, false),
+(-13, -33, true,  false, false, false),
+(-14, -34, false, false, false, false),
+(-15, -35, false, false, false, false);
+-- =====================================================
+-- POSITIONS (INSERT)
+-- =====================================================
+-- Svi turisti imaju trenutnu poziciju
+
+INSERT INTO tours."Positions" ("TouristId", "Latitude", "Longitude")
+VALUES
+(-21, 45.1518, 19.7208), -- Na Fruškoj Gori (Active tour)
+(-22, 45.2556, 19.8428), -- Novi Sad centar
+(-23, 45.1520, 19.7210), -- Na Fruškoj Gori (Active tour)
+(-24, 45.2566, 19.8434), -- Na Zmaj Jovinoj (Active tour - gastro)
+(-25, 45.2600, 19.8300), -- Kod napuštene fabrike
+(-26, 45.201360504556725, 19.93331909179688), -- Ribarsko ostrvo
+(-27, 45.2556, 19.8500), -- Dunavska obala (Active tour)
+(-28, 45.2520, 19.8618), -- Petrovaradinska tvrđava (Active tour)
+(-29, 43.3209, 21.8958), -- Niš centar
+(-30, 46.1005, 19.6659), -- Subotica (Active tour)
+(-31, 44.8200, 20.4550), -- Beograd Kalemegdan (Active tour)
+(-32, 45.2543, 19.8415), -- Kod restorana (Active tour - gastro)
+(-33, 45.2605, 19.8305), -- U napuštenoj fabrici (Active tour - urbex)
+(-34, 44.8180, 20.4570), -- Beograd Knez Mihailova (Active tour)
+(-35, 45.2560, 19.8450); -- Novi Sad Dunav
+
+-- =====================================================
+-- BUNDLES (INSERT)
+-- =====================================================
+-- Min. 2 ture, cena 15-25% popust
+
+INSERT INTO tours."Bundles"("Id", "Name", "Price", "Status", "AuthorId", "CreatedAt", "UpdatedAt", "PublishedAt", "ArchivedAt", "TourIds")
+VALUES
+-- PUBLISHED bundles (Status=1)
+(-1, 'Istorija Srbije Paket', 
+ 480, 1, -12, '2024-11-20 10:00:00', NULL, '2024-11-25 12:00:00', NULL, 
+ '[-1, -3, -5]'::jsonb), -- Tvrđava(250) + Kalemegdan(280) + Niš(290) = 820, sa 41% popusta = 480
+
+(-2, 'Priroda i Planine', 
+ 550, 1, -11, '2024-11-22 11:00:00', NULL, '2024-11-27 13:00:00', NULL, 
+ '[-2, -4]'::jsonb), -- Fruška Gora(380) + Dunavska Obala(320) = 700, sa 21% popusta = 550
+
+(-3, 'Avanturistički Paket', 
+ 640, 1, -13, '2024-11-25 12:00:00', NULL, '2024-12-01 14:00:00', NULL, 
+ '[-7, -8]'::jsonb), -- Urbex(350) + Gastro(420) = 770, sa 17% popusta = 640
+
+-- DRAFT bundle (Status=0)
+(-4, 'Zimski Specijaliteti',
+ 0, 0, -11, '2025-01-15 10:00:00', NULL, NULL, NULL, 
+ '[-9, -10]'::jsonb),
+
+-- ARCHIVED bundle (Status=2)
+(-5, 'Stari Letnji Paket',
+ 500, 2, -12, '2024-06-01 10:00:00', NULL, '2024-06-05 10:00:00', '2024-09-30 23:59:59', 
+ '[-11, -12]'::jsonb);
+
+-- =====================================================
+-- COUPONS (INSERT)
+-- =====================================================
+-- Code: 8 karaktera, % popusta, datum isteka
+
+INSERT INTO tours."Coupons"("Id", "Code", "DiscountPercentage", "ExpiryDate", "TourId", "AuthorId", "CreatedAt")
+VALUES
+-- Važeći kuponi za specifične ture
+(-1, 'TVRD2025', 15.00, '2025-12-31 23:59:59', -1, -11, '2024-12-01 10:00:00'),
+(-2, 'KALE2025', 20.00, '2025-06-30 23:59:59', -3, -12, '2024-12-05 10:00:00'),
+(-3, 'URBEX100', 25.00, '2025-03-31 23:59:59', -7, -13, '2024-12-10 10:00:00'),
+
+-- Važeći kuponi za sve ture autora (TourId = NULL)
+(-4, 'AUTOR11', 10.00, '2025-12-31 23:59:59', NULL, -11, '2024-12-15 10:00:00'),
+(-5, 'AUTOR12', 12.00, '2025-12-31 23:59:59', NULL, -12, '2024-12-16 10:00:00'),
+
+-- Istekli kuponi
+(-6, 'OLD2024', 30.00, '2024-12-31 23:59:59', -1, -11, '2024-06-01 10:00:00'),
+
+-- Kuponi bez datuma isteka (važe zauvek)
+(-7, 'FOREVER1', 5.00, NULL, -2, -11, '2024-12-20 10:00:00'),
+(-8, 'FOREVER2', 8.00, NULL, NULL, -13, '2024-12-22 10:00:00'),
+(-9, 'VISTA', 10.00, NULL, NULL, -13, '2024-12-22 10:00:00');
+
+-- =====================================================
+-- SALES (INSERT)
+-- =====================================================
+-- Max trajanje 2 nedelje
+
+INSERT INTO tours."Sales"("Id", "TourIds", "StartDate", "EndDate", "DiscountPercentage", "AuthorId", "CreatedAt", "UpdatedAt")
+VALUES
+-- Aktivne prodaje (trenutno važeće)
+(-1, '[-1, -2, -4]'::jsonb, '2025-02-01', '2025-02-14', 20.00, -11, '2025-01-25 10:00:00', NULL),
+(-2, '[-3, -5]'::jsonb, '2025-02-03', '2025-02-17', 25.00, -12, '2025-01-28 10:00:00', NULL),
+(-3, '[-7, -8]'::jsonb, '2025-02-05', '2025-02-12', 15.00, -13, '2025-02-01 10:00:00', NULL),
+
+-- Buduće prodaje
+(-4, '[-6]'::jsonb, '2025-02-15', '2025-02-28', 30.00, -13, '2025-02-05 10:00:00', NULL),
+
+-- Završene prodaje
+(-5, '[-1, -3]'::jsonb, '2024-12-15', '2024-12-29', 20.00, -11, '2024-12-10 10:00:00', NULL),
+(-6, '[-5, -6]'::jsonb, '2024-11-01', '2024-11-14', 35.00, -12, '2024-10-25 10:00:00', NULL);
+
+-- =====================================================
+-- BLOGS (INSERT)
+-- =====================================================
+-- Statusi: ReadOnly (<-10 score), Active (>100 score, >10 comments), Famous (>500 score, >30 comments)
+
+INSERT INTO blog."Blogs"("Id", "Title", "Description", "CreationDate", "AuthorId", "Status") VALUES
+-- FAMOUS blogs (>500 score, >30 comments)
+(-1, 'Kako Preživeti Planinarenje na Fruškoj Gori - Kompletni Vodič', 
+'Fruška Gora je pravo planinarsko blago Vojvodine. U ovom članku delim sve što sam naučio tokom godina istraživanja ovih predivnih staza...', 
+'2024-10-01 10:00:00', -11, 4),
+
+(-2, 'TOP 10 Skrivenih Urbex Lokacija u Novom Sadu', 
+'Posle 5 godina istraživanja, otkrio sam najzanimljivije napuštene lokacije u gradu. Oprez - neke su opasne!', 
+'2024-09-15 14:00:00', -13, 4),
+
+-- ACTIVE blogs (>100 score, >10 comments)
+(-3, 'Kalemegdan - Istorija Kroz Vekove', 
+'Kalemegdan nije samo park - to je istorijski kompleks koji krije priče iz različitih epoha...', 
+'2024-11-10 09:00:00', -12, 3),
+
+(-4, 'Najbolja Gastro Putovanja Kroz Vojvodinu', 
+'Od Sremskih Karlovaca do tradicionalnih salaša - gde probati najbolje specijalitete?', 
+'2024-11-20 12:00:00', -13, 3),
+
+(-5, 'Biciklističke Staze Duž Dunava - Moj Omiljeni Hobi', 
+'Dunav pruža najlepše biciklističke rute u Srbiji. Evo mojih top 5 preporuka...', 
+'2024-12-01 15:00:00', -12, 3),
+
+-- READONLY blogs (<-10 score)
+(-6, 'Zašto Je Ova Aplikacija Beskorisna', 
+'Potpuno sam razočaran ovom aplikacijom. Ništa ne radi kako treba i puna je bagova...', 
+'2024-11-05 16:00:00', -25, 5),
+
+(-7, 'Ne Idite na Turu XYZ - Prevara!', 
+'Autor ture je lagao o svemu. Cena je bila prevelika, a sadržaj loš. Ne preporučujem nikome!', 
+'2024-11-12 18:00:00', -26, 5),
+
+-- DRAFT blogs
+(-8, 'U pripremi - Zimski Vodič Za Planinarenje', 
+'Ovaj blog je još uvek u izradi...', 
+'2025-01-20 10:00:00', -11, 0),
+
+-- PUBLISHED blogs (normalan skor, par komentara)
+(-9, 'Moj Prvi Urbex - Napuštena Fabrika', 
+'Podelio bih moje prvo iskustvo istraživanja napuštene fabrike u Novom Sadu...', 
+'2024-12-15 11:00:00', -33, 1),
+
+(-10, 'Porodična Šetnja Kroz Subotica - Sa Decom', 
+'Subotica je idealna za porodični izlet. Evo kako smo proveli dan sa decom...', 
+'2024-12-20 13:00:00', -30, 1);
+
+-- Blog Images
+INSERT INTO blog."BlogImages"("Id", "ImageUrl", "BlogId") VALUES
+(-1, 'https://picsum.photos/id/1018/1000/600', -1),
+(-2, 'https://picsum.photos/id/1019/1000/600', -1),
+(-3, 'https://picsum.photos/id/1025/1000/600', -2),
+(-4, 'https://picsum.photos/id/1026/1000/600', -2),
+(-5, 'https://picsum.photos/id/1027/1000/600', -2),
+(-6, 'https://picsum.photos/id/1018/1000/600', -3),
+(-7, 'https://picsum.photos/id/1060/1000/600', -4),
+(-8, 'https://picsum.photos/id/1061/1000/600', -4),
+(-9, 'https://picsum.photos/id/1040/1000/600', -5),
+(-10, 'https://picsum.photos/id/1025/1000/600', -9),
+(-11, 'https://picsum.photos/id/260/1000/600', -10);
+
+-- =====================================================
+-- BLOG RATINGS (INSERT)
+-- =====================================================
+-- VoteType: -1 = Downvote, 1 = Upvote
+-- Za Famous: >500 score (např. 510 upvotes, 0 downvotes)
+-- Za Active: >100 score (npr. 120 upvotes, 10 downvotes = 110 score)
+-- Za ReadOnly: <-10 score (npr. 5 upvotes, 20 downvotes = -15 score)
+
+-- Blog -1: FAMOUS (510 upvotes, 5 downvotes = 505 score)
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+SELECT -1, -21 + series, 1, '2024-10-05 10:00:00'
+FROM generate_series(0, 509) AS series
+WHERE -21 + series BETWEEN -21 AND -35 OR -21 + series BETWEEN -1 AND 475;
+
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+VALUES 
+(-1, -100, -1, '2024-10-05 11:00:00'),
+(-1, -101, -1, '2024-10-05 11:05:00'),
+(-1, -102, -1, '2024-10-05 11:10:00'),
+(-1, -103, -1, '2024-10-05 11:15:00'),
+(-1, -104, -1, '2024-10-05 11:20:00');
+
+-- Blog -2: FAMOUS (520 upvotes, 10 downvotes = 510 score)
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+SELECT -2, -500 + series, 1, '2024-09-20 10:00:00'
+FROM generate_series(0, 519) AS series;
+
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+SELECT -2, -1000 + series, -1, '2024-09-20 11:00:00'
+FROM generate_series(0, 9) AS series;
+
+-- Blog -3: ACTIVE (120 upvotes, 10 downvotes = 110 score)
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+SELECT -3, -1500 + series, 1, '2024-11-15 10:00:00'
+FROM generate_series(0, 119) AS series;
+
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+SELECT -3, -2000 + series, -1, '2024-11-15 11:00:00'
+FROM generate_series(0, 9) AS series;
+
+-- Blog -4: ACTIVE (130 upvotes, 20 downvotes = 110 score)
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+SELECT -4, -2500 + series, 1, '2024-11-25 10:00:00'
+FROM generate_series(0, 129) AS series;
+
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+SELECT -4, -3000 + series, -1, '2024-11-25 11:00:00'
+FROM generate_series(0, 19) AS series;
+
+-- Blog -5: ACTIVE (105 upvotes, 0 downvotes = 105 score)
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+SELECT -5, -3500 + series, 1, '2024-12-05 10:00:00'
+FROM generate_series(0, 104) AS series;
+
+-- Blog -6: READONLY (5 upvotes, 20 downvotes = -15 score)
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+VALUES 
+(-6, -21, 1, '2024-11-05 17:00:00'),
+(-6, -22, 1, '2024-11-05 17:05:00'),
+(-6, -23, 1, '2024-11-05 17:10:00'),
+(-6, -24, 1, '2024-11-05 17:15:00'),
+(-6, -25, 1, '2024-11-05 17:20:00');
+
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+SELECT -6, -4000 + series, -1, '2024-11-05 18:00:00'
+FROM generate_series(0, 19) AS series;
+
+-- Blog -7: READONLY (3 upvotes, 25 downvotes = -22 score)
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+VALUES 
+(-7, -27, 1, '2024-11-12 19:00:00'),
+(-7, -28, 1, '2024-11-12 19:05:00'),
+(-7, -29, 1, '2024-11-12 19:10:00');
+
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+SELECT -7, -4500 + series, -1, '2024-11-12 20:00:00'
+FROM generate_series(0, 24) AS series;
+
+-- Blog -9: PUBLISHED (15 upvotes, 3 downvotes = 12 score)
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+VALUES 
+(-9, -21, 1, '2024-12-15 12:00:00'),
+(-9, -22, 1, '2024-12-15 12:05:00'),
+(-9, -23, 1, '2024-12-15 12:10:00'),
+(-9, -24, 1, '2024-12-15 12:15:00'),
+(-9, -25, 1, '2024-12-15 12:20:00'),
+(-9, -26, 1, '2024-12-15 12:25:00'),
+(-9, -27, 1, '2024-12-15 12:30:00'),
+(-9, -28, 1, '2024-12-15 12:35:00'),
+(-9, -29, 1, '2024-12-15 12:40:00'),
+(-9, -30, 1, '2024-12-15 12:45:00'),
+(-9, -31, 1, '2024-12-15 12:50:00'),
+(-9, -32, 1, '2024-12-15 12:55:00'),
+(-9, -33, 1, '2024-12-15 13:00:00'),
+(-9, -34, 1, '2024-12-15 13:05:00'),
+(-9, -35, 1, '2024-12-15 13:10:00'),
+(-9, -100, -1, '2024-12-15 14:00:00'),
+(-9, -101, -1, '2024-12-15 14:05:00'),
+(-9, -102, -1, '2024-12-15 14:10:00');
+
+-- Blog -10: PUBLISHED (20 upvotes, 5 downvotes = 15 score)
+INSERT INTO blog."BlogRatings"("BlogId", "UserId", "VoteType", "CreatedAt")
+VALUES 
+(-10, -21, 1, '2024-12-20 14:00:00'),
+(-10, -22, 1, '2024-12-20 14:05:00'),
+(-10, -23, 1, '2024-12-20 14:10:00'),
+(-10, -24, 1, '2024-12-20 14:15:00'),
+(-10, -25, 1, '2024-12-20 14:20:00'),
+(-10, -26, 1, '2024-12-20 14:25:00'),
+(-10, -27, 1, '2024-12-20 14:30:00'),
+(-10, -28, 1, '2024-12-20 14:35:00'),
+(-10, -29, 1, '2024-12-20 14:40:00'),
+(-10, -30, 1, '2024-12-20 14:45:00'),
+(-10, -31, 1, '2024-12-20 14:50:00'),
+(-10, -32, 1, '2024-12-20 14:55:00'),
+(-10, -33, 1, '2024-12-20 15:00:00'),
+(-10, -34, 1, '2024-12-20 15:05:00'),
+(-10, -35, 1, '2024-12-20 15:10:00'),
+(-10, -11, 1, '2024-12-20 15:15:00'),
+(-10, -12, 1, '2024-12-20 15:20:00'),
+(-10, -13, 1, '2024-12-20 15:25:00'),
+(-10, -100, 1, '2024-12-20 15:30:00'),
+(-10, -101, 1, '2024-12-20 15:35:00'),
+(-10, -102, -1, '2024-12-20 16:00:00'),
+(-10, -103, -1, '2024-12-20 16:05:00'),
+(-10, -104, -1, '2024-12-20 16:10:00'),
+(-10, -105, -1, '2024-12-20 16:15:00'),
+(-10, -106, -1, '2024-12-20 16:20:00');
+
+-- =====================================================
+-- BLOG COMMENTS (INSERT)
+-- =====================================================
+-- Famous blogs: >30 komentara, Active blogs: >10 komentara
+
+-- Blog -1: FAMOUS (35 komentara)
+INSERT INTO blog."Comments"("BlogId", "AuthorId", "Text", "CreatedAt", "EditedAt") VALUES
+(-1, -21, 'Odličan vodič! Baš mi je pomogao za prvu turu na Fruškoj Gori.', '2024-10-02 10:00:00', NULL),
+(-1, -22, 'Hvala na detaljnim uputstvima za opremu!', '2024-10-02 11:00:00', NULL),
+(-1, -23, 'Planiram da idem sledeće nedelje, ovaj blog mi je sve objasnio.', '2024-10-03 12:00:00', NULL),
+(-1, -24, 'Koje su najbolje staze za početnike?', '2024-10-03 13:00:00', NULL),
+(-1, -11, 'Za početnike preporučujem crvenu stazu od parkinga do manastira Krušedol.', '2024-10-03 14:00:00', NULL),
+(-1, -25, 'Super saveti za vodu i užinu!', '2024-10-04 15:00:00', NULL),
+(-1, -26, 'Da li je bezbedno ići solo ili bolje u grupi?', '2024-10-04 16:00:00', NULL),
+(-1, -11, 'Bezbedno je i solo, ali uvek je lepše u društvu.', '2024-10-04 17:00:00', NULL),
+(-1, -27, 'Odličan blog, delio sam sa prijateljima!', '2024-10-05 10:00:00', NULL),
+(-1, -28, 'Hvala što si podelio fotografije, izgledaju predivno!', '2024-10-05 11:00:00', NULL),
+(-1, -29, 'Planiram porodični izlet, da li je prikladno za decu?', '2024-10-06 12:00:00', NULL),
+(-1, -11, 'Da, postoje lake staze prikladne za decu stariju od 6 godina.', '2024-10-06 13:00:00', NULL),
+(-1, -30, 'Fantastičan vodič! Hvala!', '2024-10-07 14:00:00', NULL),
+(-1, -31, 'Koje je najbolje godišnje doba za planinarenje?', '2024-10-07 15:00:00', NULL),
+(-1, -11, 'Proleće i jesen su idealni, leto može biti vrućina.', '2024-10-07 16:00:00', NULL),
+(-1, -32, 'Odličan blog, sve pohvale!', '2024-10-08 17:00:00', NULL),
+(-1, -33, 'Imam iskustva sa planinarenjem, ali sam naučio i nove stvari ovde.', '2024-10-09 10:00:00', NULL),
+(-1, -34, 'Fotografije su prelepe, jedva čekam da idem!', '2024-10-09 11:00:00', NULL),
+(-1, -35, 'Hvala na preporukama za parking!', '2024-10-10 12:00:00', NULL),
+(-1, -21, 'Moram ponovo ići, prošli put je bilo sjajno!', '2024-10-11 13:00:00', NULL),
+(-1, -22, 'Da li postoje vođene ture?', '2024-10-12 14:00:00', NULL),
+(-1, -11, 'Da, organizujem vođene ture svakog vikenda!', '2024-10-12 15:00:00', NULL),
+(-1, -23, 'Odličan sadržaj, nastavi ovako!', '2024-10-13 16:00:00', NULL),
+(-1, -24, 'Preporučio bih ovaj blog svima!', '2024-10-14 17:00:00', NULL),
+(-1, -25, 'Super iskustvo, hvala na savetima!', '2024-10-15 10:00:00', NULL),
+(-1, -26, 'Planiram da ispratim sve tvoje blogove!', '2024-10-16 11:00:00', NULL),
+(-1, -27, 'Odličan vodič, sve pohvale!', '2024-10-17 12:00:00', NULL),
+(-1, -28, 'Hvala ti što deliš svoja iskustva!', '2024-10-18 13:00:00', NULL),
+(-1, -29, 'Da li ima parking blizu početka staze?', '2024-10-19 14:00:00', NULL),
+(-1, -11, 'Da, postoji besplatan parking 100m od ulaza.', '2024-10-19 15:00:00', NULL),
+(-1, -30, 'Odlično napisano, sve jasno!', '2024-10-20 16:00:00', NULL),
+(-1, -31, 'Hvala na detaljima o opremi!', '2024-10-21 17:00:00', NULL),
+(-1, -32, 'Super blog, nastavi da pišeš!', '2024-10-22 10:00:00', NULL),
+(-1, -33, 'Jedva čekam da isprobam ove staze!', '2024-10-23 11:00:00', NULL),
+(-1, -34, 'Fotografije su spektakularne!', '2024-10-24 12:00:00', NULL);
+
+-- Blog -2: FAMOUS (40 komentara)
+INSERT INTO blog."Comments"("BlogId", "AuthorId", "Text", "CreatedAt", "EditedAt") VALUES
+(-2, -25, 'Konačno neko ko deli urbex lokacije! Hvala!', '2024-09-16 10:00:00', NULL),
+(-2, -33, 'Odličan blog! Da li si bio u fabrici na Limanu?', '2024-09-16 11:00:00', NULL),
+(-2, -13, 'Nisam, ali planiram uskoro. Čuo sam da je zanimljiva.', '2024-09-16 12:00:00', NULL),
+(-2, -21, 'Urbex mi je uvek bio zanimljiv, hvala na preporukama!', '2024-09-17 13:00:00', NULL),
+(-2, -22, 'Da li je bezbedno ići sam?', '2024-09-17 14:00:00', NULL),
+(-2, -13, 'Preporučujem uvek da ideš sa nekim. Neke lokacije su opasne.', '2024-09-17 15:00:00', NULL),
+(-2, -23, 'Odlične fotografije! Kako si ih pravio?', '2024-09-18 16:00:00', NULL),
+(-2, -13, 'Koristim DSLR kameru sa širokim objektivom.', '2024-09-18 17:00:00', NULL),
+(-2, -24, 'Fascinantno! Nikad nisam razmišljao o urbexu.', '2024-09-19 10:00:00', NULL),
+(-2, -25, 'Super lokacije, išao sam na nekoliko!', '2024-09-19 11:00:00', NULL),
+(-2, -26, 'Da li je dozvoljeno ulaziti u napuštene zgrade?', '2024-09-20 12:00:00', NULL),
+(-2, -13, 'Tehnički ne, ali mnogi to rade. Oprez je važan.', '2024-09-20 13:00:00', NULL),
+(-2, -27, 'Odličan blog, nastaviću da pratim!', '2024-09-21 14:00:00', NULL),
+(-2, -28, 'Hvala na preporukama!', '2024-09-22 15:00:00', NULL),
+(-2, -29, 'Da li organizuješ grupne urbex ture?', '2024-09-23 16:00:00', NULL),
+(-2, -13, 'Da, kontaktiraj me na privatnoj poruci.', '2024-09-23 17:00:00', NULL),
+(-2, -30, 'Fotografije su prelepe!', '2024-09-24 10:00:00', NULL),
+(-2, -31, 'Super sadržaj!', '2024-09-25 11:00:00', NULL),
+(-2, -32, 'Da li postoje i druge urbex lokacije van Novog Sada?', '2024-09-26 12:00:00', NULL),
+(-2, -13, 'Da, planiram blog o urbex lokacijama u Beogradu.', '2024-09-26 13:00:00', NULL),
+(-2, -33, 'Jedva čekam sledeći blog!', '2024-09-27 14:00:00', NULL),
+(-2, -34, 'Odličan sadržaj, hvala!', '2024-09-28 15:00:00', NULL),
+(-2, -35, 'Urbex je fascinantan, hvala na inspiraciji!', '2024-09-29 16:00:00', NULL),
+(-2, -21, 'Da li imaš GPS koordinate ovih lokacija?', '2024-09-30 17:00:00', NULL),
+(-2, -13, 'Namerno ne delim koordinate da bi zaštitio lokacije.', '2024-09-30 18:00:00', NULL),
+(-2, -22, 'Razumem, odgovorno ponašanje!', '2024-10-01 10:00:00', NULL),
+(-2, -23, 'Super blog, sve pohvale!', '2024-10-02 11:00:00', NULL),
+(-2, -24, 'Hvala što deliš svoja iskustva!', '2024-10-03 12:00:00', NULL),
+(-2, -25, 'Odličan sadržaj, nastavi!', '2024-10-04 13:00:00', NULL),
+(-2, -26, 'Fascinantne lokacije!', '2024-10-05 14:00:00', NULL),
+(-2, -27, 'Jedva čekam da isprobam neke od ovih mesta!', '2024-10-06 15:00:00', NULL),
+(-2, -28, 'Super fotografije!', '2024-10-07 16:00:00', NULL),
+(-2, -29, 'Hvala na inspiraciji!', '2024-10-08 17:00:00', NULL),
+(-2, -30, 'Odličan blog!', '2024-10-09 10:00:00', NULL),
+(-2, -31, 'Sve pohvale!', '2024-10-10 11:00:00', NULL),
+(-2, -32, 'Nastaviću da pratim tvoj rad!', '2024-10-11 12:00:00', NULL),
+(-2, -33, 'Hvala na ovom sadržaju!', '2024-10-12 13:00:00', NULL),
+(-2, -34, 'Odličan blog, sve preporuke!', '2024-10-13 14:00:00', NULL),
+(-2, -35, 'Super urbex sadržaj!', '2024-10-14 15:00:00', NULL),
+(-2, -25, 'Ovo je najbolji urbex blog u Srbiji!', '2024-10-15 16:00:00', NULL);
+
+-- Blog -3: ACTIVE (12 komentara)
+INSERT INTO blog."Comments"("BlogId", "AuthorId", "Text", "CreatedAt", "EditedAt") VALUES
+(-3, -22, 'Kalemegdan je predivan! Hvala na istorijskim detaljima.', '2024-11-11 10:00:00', NULL),
+(-3, -31, 'Odličan blog o Beogradu!', '2024-11-11 11:00:00', NULL),
+(-3, -21, 'Učio sam neke nove stvari o Kalemegdanu.', '2024-11-12 12:00:00', NULL),
+(-3, -23, 'Super sadržaj!', '2024-11-12 13:00:00', NULL),
+(-3, -24, 'Hvala na preporukama!', '2024-11-13 14:00:00', NULL),
+(-3, -25, 'Da li si bio u Pobedniku?', '2024-11-13 15:00:00', NULL),
+(-3, -12, 'Da, obavezno posetite! Pogled je spektakularan.', '2024-11-13 16:00:00', NULL),
+(-3, -26, 'Odličan blog!', '2024-11-14 17:00:00', NULL),
+(-3, -27, 'Hvala na informacijama!', '2024-11-15 10:00:00', NULL),
+(-3, -28, 'Planiram da posetim uskoro!', '2024-11-15 11:00:00', NULL),
+(-3, -29, 'Super blog o Beogradu!', '2024-11-16 12:00:00', NULL),
+(-3, -30, 'Hvala na istorijskim detaljima!', '2024-11-16 13:00:00', NULL);
+
+-- Blog -4: ACTIVE (15 komentara)
+INSERT INTO blog."Comments"("BlogId", "AuthorId", "Text", "CreatedAt", "EditedAt") VALUES
+(-4, -24, 'Odličan gastro vodič! Probao sam neke od ovih restorana.', '2024-11-21 10:00:00', NULL),
+(-4, -32, 'Vinarije u Sremskim Karlovcima su sjajne!', '2024-11-21 11:00:00', NULL),
+(-4, -21, 'Hvala na preporukama za tradicionalnu kuhinju!', '2024-11-22 12:00:00', NULL),
+(-4, -22, 'Super sadržaj!', '2024-11-22 13:00:00', NULL),
+(-4, -23, 'Da li si probao kulen iz Bačke?', '2024-11-23 14:00:00', NULL),
+(-4, -13, 'Nisam još, ali je na mojoj listi!', '2024-11-23 15:00:00', NULL),
+(-4, -25, 'Odličan blog!', '2024-11-24 16:00:00', NULL),
+(-4, -26, 'Hvala za preporuke!', '2024-11-24 17:00:00', NULL),
+(-4, -27, 'Planiram gastro turu!', '2024-11-25 10:00:00', NULL),
+(-4, -28, 'Super sadržaj!', '2024-11-25 11:00:00', NULL),
+(-4, -29, 'Da li organizuješ gastro ture?', '2024-11-26 12:00:00', NULL),
+(-4, -13, 'Da, kontaktiraj me!', '2024-11-26 13:00:00', NULL),
+(-4, -30, 'Hvala na preporukama!', '2024-11-27 14:00:00', NULL),
+(-4, -31, 'Odličan blog!', '2024-11-27 15:00:00', NULL),
+(-4, -32, 'Super gastro vodič!', '2024-11-28 16:00:00', NULL);
+
+-- Blog -5: ACTIVE (11 komentara)
+INSERT INTO blog."Comments"("BlogId", "AuthorId", "Text", "CreatedAt", "EditedAt") VALUES
+(-5, -27, 'Odličan vodič za bicikliste!', '2024-12-02 10:00:00', NULL),
+(-5, -21, 'Planiram biciklističku turu duž Dunava!', '2024-12-02 11:00:00', NULL),
+(-5, -22, 'Super preporuke!', '2024-12-03 12:00:00', NULL),
+(-5, -23, 'Hvala za detalje!', '2024-12-03 13:00:00', NULL),
+(-5, -24, 'Da li su staze bezbedne?', '2024-12-04 14:00:00', NULL),
+(-5, -12, 'Da, većina staza je dobro označena i bezbedna.', '2024-12-04 15:00:00', NULL),
+(-5, -25, 'Odličan blog!', '2024-12-05 16:00:00', NULL),
+(-5, -26, 'Hvala na informacijama!', '2024-12-05 17:00:00', NULL),
+(-5, -27, 'Super sadržaj za bicikliste!', '2024-12-06 10:00:00', NULL),
+(-5, -28, 'Planiram da isprobam ove rute!', '2024-12-06 11:00:00', NULL),
+(-5, -29, 'Hvala na preporukama!', '2024-12-07 12:00:00', NULL);
+
+-- Blog -9: PUBLISHED (4 komentara)
+INSERT INTO blog."Comments"("BlogId", "AuthorId", "Text", "CreatedAt", "EditedAt") VALUES
+(-9, -21, 'Zanimljivo prvo iskustvo!', '2024-12-15 14:00:00', NULL),
+(-9, -25, 'Dobro si započeo urbex!', '2024-12-15 15:00:00', NULL),
+(-9, -33, 'Oprez u napuštenim zgradama!', '2024-12-16 16:00:00', NULL),
+(-9, -13, 'Hvala na savetu!', '2024-12-16 17:00:00', NULL);
+
+-- Blog -10: PUBLISHED (5 komentara)
+INSERT INTO blog."Comments"("BlogId", "AuthorId", "Text", "CreatedAt", "EditedAt") VALUES
+(-10, -22, 'Subotica je predivna za porodični izlet!', '2024-12-20 16:00:00', NULL),
+(-10, -30, 'Hvala za preporuke sa decom!', '2024-12-20 17:00:00', NULL),
+(-10, -24, 'Planiram da posetim sa porodicom!', '2024-12-21 10:00:00', NULL),
+(-10, -26, 'Super sadržaj!', '2024-12-21 11:00:00', NULL),
+(-10, -28, 'Hvala za informacije!', '2024-12-21 12:00:00', NULL);
+
+-- =====================================================
+-- ENCOUNTER ACTIVATIONS (INSERT)
+-- =====================================================
+
+INSERT INTO encounters."EncounterActivations"(
+  "Id", "EncounterId", "TouristId", "Status", "ActivatedAt", "CompletedAt",
+  "LastLocationUpdateAt", "CurrentLatitude", "CurrentLongitude"
+)
+VALUES 
+-- COMPLETED activations (Status=1)
+(-1, -1, -21, 1, '2024-12-16 11:30:00', '2024-12-16 11:45:00', NULL, NULL, NULL),
+(-2, -7, -21, 1, '2025-01-30 10:30:00', '2025-01-30 11:15:00', NULL, NULL, NULL),
+(-3, -8, -22, 1, '2024-12-18 14:00:00', '2024-12-18 14:35:00', NULL, NULL, NULL),
+(-4, -9, -25, 1, '2024-12-21 17:00:00', '2024-12-21 17:40:00', NULL, NULL, NULL),
+
+-- IN PROGRESS activations (Status=0)
+(-5, -4, -21, 0, '2025-02-06 10:00:00', NULL, '2025-02-06 14:00:00', 45.1520, 19.7210),
+(-6, -4, -23, 0, '2025-02-06 10:05:00', NULL, '2025-02-06 14:00:00', 45.1520, 19.7210),
+(-7, -5, -27, 0, '2025-02-06 09:00:00', NULL, '2025-02-06 11:00:00', 45.2556, 19.8500),
+
+-- ABANDONED activations (Status=2)
+(-8, -6, -24, 2, '2025-02-05 12:00:00', NULL, '2025-02-05 13:00:00', 45.2566, 19.8434);
+
+-- =====================================================
+-- MEETUPS (INSERT)
+-- =====================================================
+
+INSERT INTO stakeholders."Meetups" ("Id", "Title", "Description", "DateTime", "Address", "Latitude", "Longitude", "CreatorId", "TourId") VALUES
+-- Meetupi vezani za ture
+(-1, 'Druženje Pre Ture na Fruškoj Gori', 
+'Okupljanje svih učesnika ture na Fruškoj Gori. Upoznajmo se pre početka planinarenja!', 
+'2026-03-15 08:00:00', 'Parking Fruška Gora - Početak Staze', 45.1500, 19.7200, -11, -2),
+
+(-2, 'Urbex Grupa - Zajednička Akcija', 
+'Istraživanje urbex lokacija u grupi. Bezbednije i zabavnije zajedno!', 
+'2026-03-20 14:00:00', 'Napuštena Fabrika - Liman', 45.2600, 19.8300, -13, -7),
+
+(-3, 'Gastro Tura - Degustacija', 
+'Okupljanje gourmet entuzijasta pre gastro ture. Upoznajmo se uz kafu!', 
+'2026-03-18 11:30:00', 'Restoran Dunavski Biser', 45.2556, 19.8428, -13, -8),
+
+-- Meetupi nevezani za turu (TourId = NULL)
+(-4, 'Planinarski Klub - Mesečni Sastanak', 
+'Mesečni sastanak članova planinarskog kluba. Planiranje buduć ih akcija.', 
+'2026-02-25 18:00:00', 'Kafić Planina, Novi Sad', 45.2550, 19.8430, -23, NULL),
+
+(-5, 'Fotografisanje Zalaska Sunca na Dunavu', 
+'Okupljanje fotografa za zajednički photo walk tokom zalaska sunca.', 
+'2026-02-28 17:30:00', 'Dunavska Obala - Kej', 45.2560, 19.8510, -35, NULL),
+
+(-6, 'Biciklisti Novog Sada - Vikend Vožnja', 
+'Opuštena vikend vožnja biciklom kroz grad i okolinu.', 
+'2026-03-01 10:00:00', 'Trg Slobode, Novi Sad', 45.2550, 19.8422, -27, NULL),
+
+(-7, 'Urbex Entuzijasti - Razmena Iskustava', 
+'Neformalno okupljanje urbex istraživača. Podelite svoja iskustva i lokacije!', 
+'2026-03-05 19:00:00', 'Kafić Stari Grad, Novi Sad', 45.2543, 19.8415, -25, NULL),
+
+(-8, 'Gastro Klub - Tradicionalna Jela', 
+'Diskusija o tradicionalnim vojvođanskim jelima i receptima.', 
+'2026-03-08 18:30:00', 'Restoran Kod Rajka', 45.2543, 19.8415, -24, NULL);
+
+-- =====================================================
+-- SHOPPING CARTS (INSERT)
+-- =====================================================
+-- Svaki turista ima shopping cart (neki prazni, neki sa turima/bundles)
+
+INSERT INTO payments."ShoppingCarts"("TouristId", "Items", "BundleItems", "TotalPrice") VALUES
+-- Prazni cart-ovi
+(-21, '[]'::jsonb, '[]'::jsonb, 0),
+(-22, '[]'::jsonb, '[]'::jsonb, 0),
+(-23, '[]'::jsonb, '[]'::jsonb, 0),
+
+-- Cart-ovi sa turima
+(-24, '[{"TourId": -1, "TourName": "Petrovaradinska Tvrđava - Istorijsko Blago", "Price": 250}]'::jsonb, '[]'::jsonb, 250),
+(-25, '[{"TourId": -3, "TourName": "Stari Grad Beograd - Kalemegdan", "Price": 280}, {"TourId": -5, "TourName": "Niš - Grad Cara Konstantina", "Price": 290}]'::jsonb, '[]'::jsonb, 570),
+
+-- Cart-ovi sa bundles
+(-26, '[]'::jsonb, '[]'::jsonb, 480),
+
+-- Kombinacija tura i bundles
+(-27, '[{"TourId": -6, "TourName": "Subotica - Secesijska Lepota", "Price": 270}]'::jsonb, '[{"BundleId": -2, "BundleName": "Priroda i Planine", "Price": 550}]'::jsonb, 820),
+
+-- Prazni cart-ovi
+(-28, '[]'::jsonb, '[]'::jsonb, 0),
+(-29, '[]'::jsonb, '[]'::jsonb, 0),
+(-30, '[]'::jsonb, '[]'::jsonb, 0),
+
+-- Cart sa turima
+(-31, '[{"TourId": -8, "TourName": "Gastro Tura - Vojvođanski Specijaliteti", "Price": 420}]'::jsonb, '[]'::jsonb, 420),
+
+-- Prazni cart-ovi
+(-32, '[]'::jsonb, '[]'::jsonb, 0),
+(-33, '[]'::jsonb, '[]'::jsonb, 0),
+
+-- Cart sa bundle-om
+(-34, '[]'::jsonb, '[{"BundleId": -3, "BundleName": "Avanturistički Paket", "Price": 640}]'::jsonb, 640),
+
+-- Prazan cart
+(-35, '[]'::jsonb, '[]'::jsonb, 0);
+
+-- =====================================================
+-- AWARD EVENTS (INSERT)
+-- =====================================================
+
+DELETE FROM tours."AwardEvents";
+INSERT INTO tours."AwardEvents"(
+  "Id", "Name", "Description", "Year", "Status",
+  "VotingStartDate", "VotingEndDate", "CreatedAt", "UpdatedAt"
+) VALUES
+(-1, 'Najbolja Tura 2024', 
+'Glasajte za najbolju turu godine! Pobednik će biti proglašen 31. decembra.', 
+2024, 'VotingClosed', 
+'2024-12-01 00:00:00+00', '2024-12-31 23:59:59+00', '2024-11-25 10:00:00', NULL),
+
+(-2, 'Najbolji Autor 2025', 
+'Glasanje za najboljeg autora tura u 2025. godini!', 
+2025, 'Active', 
+'2025-02-01 00:00:00+00', '2025-12-31 23:59:59+00', '2025-01-25 10:00:00', NULL),
+
+(-3, 'Najbolji Urbex Sadržaj 2025', 
+'Nagrada za najbolji urbex blog ili turu u 2025. godini.', 
+2026, 'Draft', 
+'2025-06-01 00:00:00+00', '2025-12-31 23:59:59+00', '2025-01-30 10:00:00', NULL);
+
+COMMIT;

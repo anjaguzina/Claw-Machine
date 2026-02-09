@@ -1,0 +1,38 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+x64/
+x86/
+[Dd]ebug/
+[Rr]elease/
+*.obj
+*.pdb
+*.ilk
+*.log
+*.idb
+*.tlog/
+*.vcxproj.user
+ipch/
+*.ipch
+
+# Build output
+*.exe
+*.dll
+*.lib
+
+# NuGet packages
+packages/
+*.nupkg
+
+# Blender backup
+*.blend1
+
+# Prazan klon repozitorijuma (nije deo projekta)
+Claw-Machine/
+
+# OS
+Thumbs.db
+.DS_Store
