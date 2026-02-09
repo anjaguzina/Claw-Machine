@@ -1,7 +1,8 @@
 1. kanap ne zaboravi
 2. zatvorena kandza
 3. da na space padne na dno a ne da dno proguta igracku
-4. rotacija za 180 stepeni
+4. desna igracka viri napolju, poravi to
+5. poravi polozaj gde se kupi igracka treba pregrada
+6. dubina
 
 
-7. kursor

@@ -403,12 +403,14 @@ static void drawOBJModel(const OBJModel& model, const glm::mat4& matrix, unsigne
 }
 
 // Globalne promenljive za kontrolu kamere
-float cameraYaw = 30.0f;      // Horizontalna rotacija (frontalniji pogled)
-float cameraPitch = 20.0f;    // Vertikalna rotacija
+float cameraYaw = 0.0f;       // 0 = ispred automata; horizontalna rotacija (strelice + miš)
+float cameraPitch = 20.0f;    // Vertikalna rotacija (ograničena 180° = -90 do 90)
 float cameraDistance = 4.0f;  // Udaljenost od centra
 bool mousePressed = false;
 double lastMouseX = 0.0;
 double lastMouseY = 0.0;
+// Kamera je "ispred" automata kada je yaw u ovom opsegu – tada su mogući pomeranje kandže, ubacivanje žetona i preuzimanje igračke
+const float cameraInFrontYawHalf = 50.0f;
 
 // Globalne promenljive za kandžu
 bool clawOpen = false;  // false = zatvorena, true = otvorena
@@ -473,13 +475,17 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     {
         mousePressed = true;
         glfwGetCursorPos(window, &lastMouseX, &lastMouseY);
+        // Ubacivanje žetona i preuzimanje igračke samo kad je kamera otprilike ispred automata
+        bool inFront = (cameraYaw >= -cameraInFrontYawHalf && cameraYaw <= cameraInFrontYawHalf);
+        if (!inFront) return;
+
         int width, height;
         glfwGetWindowSize(window, &width, &height);
         double mouseXNorm = lastMouseX / width;
         double mouseYNorm = lastMouseY / height;
         const double prizeHitRadius = 60.0; // pikseli
 
-        // Prvo provera: klik na osvojenu igračku u pregradi (gasenje treptanja i automata)
+        // Prvo provera: klik na osvojenu igračku u pregradi – preuzimanje igračke (gasenje treptanja i automata)
         if (prizeBlinking && (toyWon || birdWon))
         {
             if (toyWon) {
@@ -504,12 +510,12 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
             }
         }
 
-        // Klik na crveno dugme (leva strana ekrana)
+        // Klik na crveno dugme / ubacivanje žetona (leva strana ekrana – prikladan objekat)
         if (mouseXNorm < 0.6 && mouseXNorm > 0.0 && mouseYNorm > 0.2 && mouseYNorm < 0.8)
         {
             if (!machineOn) {
                 machineOn = true;
-                lightOn = true;
+                lightOn = true;  // ubacivanje žetona = uključivanje automata
             } else if (!prizeBlinking) {
                 lightOn = !lightOn;
             }
@@ -530,9 +536,9 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
         cameraYaw += (float)(deltaX * 0.5);
         cameraPitch += (float)(deltaY * 0.5);
         
-        // Ograničavamo pitch da ne ide preko glave
-        if (cameraPitch > 89.0f) cameraPitch = 89.0f;
-        if (cameraPitch < -89.0f) cameraPitch = -89.0f;
+        // Ograničenje pogleda po Y osi na 180 stepeni (-90 do 90)
+        if (cameraPitch > 90.0f) cameraPitch = 90.0f;
+        if (cameraPitch < -90.0f) cameraPitch = -90.0f;
         
         lastMouseX = xpos;
         lastMouseY = ypos;
@@ -593,6 +599,11 @@ int main(void)
     }
     
     std::cout << "Prozor kreiran i OpenGL inicijalizovan!" << std::endl;
+    
+    // Kursori: coin kad je automat isključen (početak, posle preuzimanja igračke), poluga kad je uključen
+    GLFWcursor* cursorCoin = loadImageToCursor("Resources/coin.png");
+    GLFWcursor* cursorLever = loadImageToCursor("Resources/poluga.png");
+    glfwSetCursor(window, cursorCoin);  // na početku svetlo je ugašeno
     
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -864,6 +875,17 @@ int main(void)
             glfwSetWindowShouldClose(window, GL_TRUE);
         }
 
+        // Kursor: coin kad je svetlo ugašeno (automat isključen / početak / posle preuzimanja igračke), poluga kad je uključen
+        if (lightOn)
+            glfwSetCursor(window, cursorLever);
+        else
+            glfwSetCursor(window, cursorCoin);
+
+        // Strelice levo/desno – kamera se kreće po kružnoj putanji oko automata
+        const float orbitSpeed = 55.0f;  // stepeni u sekundi
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)  cameraYaw += orbitSpeed * dt;
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) cameraYaw -= orbitSpeed * dt;
+
         // Treptanje zeleno-crveno samo dok čeka klik na osvojeru igračku (prizeBlinking); posle klika i ponovnog paljenja = svetlo plavo
         if (prizeBlinking)
         {
@@ -884,10 +906,11 @@ int main(void)
             lKeyPressed = false;
         }
         
-        // Kontrole za kandžu – samo kad je automat uključen, nema treptanja i sijalica je upaljena
+        // Kontrole za kandžu – samo kad je kamera ispred automata, automat uključen, nema treptanja i sijalica je upaljena
+        bool cameraInFront = (cameraYaw >= -cameraInFrontYawHalf && cameraYaw <= cameraInFrontYawHalf);
         static bool wPressed = false, aPressed = false, sPressed = false, dPressed = false;
         const float oneStep = 0.14f;  // veći korak po jednom pritisku WASD
-        if (machineOn && !prizeBlinking && lightOn)
+        if (cameraInFront && machineOn && !prizeBlinking && lightOn)
         {
             if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && !wPressed) { clawZ -= oneStep; wPressed = true; }
             if (glfwGetKey(window, GLFW_KEY_W) == GLFW_RELEASE) wPressed = false;
@@ -1338,6 +1361,8 @@ int main(void)
     
     glDeleteProgram(unifiedShader);
 
+    glfwDestroyCursor(cursorCoin);
+    glfwDestroyCursor(cursorLever);
     glfwTerminate();
     return 0;
 }
