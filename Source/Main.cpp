@@ -430,8 +430,10 @@ float toyCubeY = -0.12f;
 float toyCubeZ = 0.0f;
 bool toyCarried = false;   // da li kandža trenutno nosi igračku (kocku ili pticu)
 bool toyWon = false;
+bool toyCollected = false;  // true = kliknuto na medveda u pregradi, igračka nestane, pa se gasi automat
 bool birdCarried = false;
 bool birdWon = false;
+bool birdCollected = false; // true = kliknuto na zeca u pregradi, igračka nestane, pa se gasi automat
 bool birdOnFloor = false; // ptica bačena na sivo dno (ne u rupu) – crtamo je na birdToy poziciji
 int carriedWhich = 0;     // 0 = ništa, 1 = medved, 2 = zec
 const float toyFloorY = -0.16f;  // visina pada na dnu (privremeno -0.16 za test svetala)
@@ -439,10 +441,10 @@ const float toyFloorY = -0.16f;  // visina pada na dnu (privremeno -0.16 za test
 const float playFloorMinX = -0.1f, playFloorMaxX = 0.1f, playFloorMinZ = -0.1f, playFloorMaxZ = 0.1f;
 // Rupa = ceo opseg kandže (cwx/cwz do ±0.13) da svako puštanje bude inHole
 const float holeMinX = -0.14f, holeMaxX = 0.14f, holeMinZ = -0.14f, holeMaxZ = 0.14f;
-// Donja pregrada – osvojena igračka na Y -0.20 (ispod površine dna)
-const float prizeX = 0.0f, prizeY = -0.32f, prizeZ = 0.25f;   // niže u pregradi
+// Donja leva pregrada – obe igračke unutar pregrade; smanjen skala da ništa ne strši kroz metal (uvo zeke, ivice meda)
+const float prizeX = -0.15f, prizeY = -0.41f, prizeZ = 0.18f;   // obe igračke u pregradi, spušteno na dno
 float birdToyX = 0.06f, birdToyY = -0.12f, birdToyZ = 0.02f;   // zec – pomeren ulevo da uho ne viri iz stakla
-const float prize2X = 0.08f, prize2Y = -0.32f, prize2Z = 0.25f;
+const float prizeInCompartmentScale = 0.62f;  // u pregradi smanjeno da metal fizički „zakloni” ivice – ništa ne probija zid
 const float grabRadiusWorld = 0.12f;  // radijus hvatanja (veći da se lakše uhvate medved i zec)
 const float clawTipOffset = 0.32f;    // igračka niže kod pipaka da se vidi cela (clawY - offset)
 const float machineScale = 0.1f;      // modelMatrix scale za automat
@@ -489,23 +491,25 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
         double mouseYNorm = lastMouseY / height;
         const double prizeHitRadius = 60.0; // pikseli
 
-        // Prvo provera: klik na osvojenu igračku u pregradi – preuzimanje igračke (gasenje treptanja i automata)
+        // Klik na osvojenu igračku u pregradi: prvo igračka nestane (collected), pa se gasi automat
         if (prizeBlinking && (toyWon || birdWon))
         {
-            if (toyWon) {
+            if (toyWon && !toyCollected) {
                 double sx, sy;
                 worldToScreen(glm::vec3(prizeX, prizeY, prizeZ), width, height, sx, sy);
                 if ((lastMouseX - sx) * (lastMouseX - sx) + (lastMouseY - sy) * (lastMouseY - sy) < prizeHitRadius * prizeHitRadius) {
+                    toyCollected = true;  // igračka nestane
                     prizeBlinking = false;
                     machineOn = false;
                     lightOn = false;
                     return;
                 }
             }
-            if (birdWon) {
+            if (birdWon && !birdCollected) {
                 double sx, sy;
-                worldToScreen(glm::vec3(prize2X, prize2Y, prize2Z), width, height, sx, sy);
+                worldToScreen(glm::vec3(prizeX, prizeY, prizeZ), width, height, sx, sy);
                 if ((lastMouseX - sx) * (lastMouseX - sx) + (lastMouseY - sy) * (lastMouseY - sy) < prizeHitRadius * prizeHitRadius) {
+                    birdCollected = true; // igračka nestane
                     prizeBlinking = false;
                     machineOn = false;
                     lightOn = false;
@@ -954,7 +958,7 @@ int main(void)
                     else
                     {
                         if (inHole) {
-                            birdWon = true; birdToyX = prize2X; birdToyY = prize2Y; birdToyZ = prize2Z;
+                            birdWon = true; birdToyX = prizeX; birdToyY = prizeY; birdToyZ = prizeZ;
                             prizeBlinking = true; blinkTimer = 0.0f; blinkGreen = true;
                             std::cout << "Osvojena igracka u pregradi -> sijalica treperi zeleno/crveno!" << std::endl;
                         }
@@ -1201,12 +1205,13 @@ int main(void)
         
         glBindVertexArray(0);
         
-        // Medved (prva igračka) – crtamo POSLE automata da bude uvek vidljiv (na dnu ili u pregradi)
-        if (carriedWhich != 1 && bearModel.indexCount > 0)
+        // Medved (prva igračka) – crtamo osim kad je u kandži ili kad je pokupljen (nestane)
+        if (carriedWhich != 1 && bearModel.indexCount > 0 && !(toyWon && toyCollected))
         {
+            float scale = toyWon ? (bearScale * prizeInCompartmentScale) : bearScale;  // u pregradi manje da ne strči kroz metal
             glm::mat4 bearMatrix = glm::mat4(1.0f);
             bearMatrix = glm::translate(bearMatrix, glm::vec3(toyCubeX, toyCubeY, toyCubeZ));
-            bearMatrix = glm::scale(bearMatrix, glm::vec3(bearScale, bearScale, bearScale));
+            bearMatrix = glm::scale(bearMatrix, glm::vec3(scale, scale, scale));
             drawOBJModel(bearModel, bearMatrix, modelLoc, unifiedShader);
         }
         
@@ -1226,13 +1231,14 @@ int main(void)
             }
         }
         
-        // Zec (druga igračka) – crtamo kad NIJE u kandži; rotacija 180° oko Y da gleda prema kameri
-        if (carriedWhich != 2 && rabbitModel.indexCount > 0)
+        // Zec (druga igračka) – crtamo osim kad je u kandži ili kad je pokupljen (nestane)
+        if (carriedWhich != 2 && rabbitModel.indexCount > 0 && !(birdWon && birdCollected))
         {
+            float scale = birdWon ? (rabbitScale * prizeInCompartmentScale) : rabbitScale;  // u pregradi manje da uvo ne strči kroz metal
             glm::mat4 rabbitMatrix = glm::mat4(1.0f);
             rabbitMatrix = glm::translate(rabbitMatrix, glm::vec3(birdToyX, birdToyY, birdToyZ));
             rabbitMatrix = glm::rotate(rabbitMatrix, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-            rabbitMatrix = glm::scale(rabbitMatrix, glm::vec3(rabbitScale, rabbitScale, rabbitScale));
+            rabbitMatrix = glm::scale(rabbitMatrix, glm::vec3(scale, scale, scale));
             drawOBJModel(rabbitModel, rabbitMatrix, modelLoc, unifiedShader);
         }
         
