@@ -412,6 +412,10 @@ double lastMouseY = 0.0;
 // Kamera je "ispred" automata kada je yaw u ovom opsegu – tada su mogući pomeranje kandže, ubacivanje žetona i preuzimanje igračke
 const float cameraInFrontYawHalf = 50.0f;
 
+// Podešavanje testiranja dubine (tasteri 1 i 2) i odstranjivanja naličja (tasteri 3 i 4) – kao na vežbama
+bool depthTestEnabled = true;   // 1 = uključi, 2 = isključi
+bool cullFaceEnabled = true;    // 3 = uključi, 4 = isključi
+
 // Globalne promenljive za kandžu
 bool clawOpen = false;  // false = zatvorena, true = otvorena
 float clawOpenAngle = 0.0f;  // Ugao otvaranja prstiju (0 = zatvoreno, 30 = otvoreno)
@@ -607,8 +611,8 @@ int main(void)
     
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_DEPTH_TEST); // Uključeno testiranje dubine
-    // CULL_FACE isključen za transparent objekte
+    glEnable(GL_DEPTH_TEST); // Uključeno testiranje dubine (taster 1/2 ga uključuje/isključuje)
+    glCullFace(GL_BACK);     // Kada je uključeno odstranjivanje naličja (taster 3), uklanjaju se zadnja lica
 
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++ KREIRANJE 3D MODELA +++++++++++++++++++++++++++++++++++++++++++++++++
     
@@ -881,6 +885,12 @@ int main(void)
         else
             glfwSetCursor(window, cursorCoin);
 
+        // Testiranje dubine (1 = uključi, 2 = isključi) i odstranjivanje naličja (3 = uključi, 4 = isključi) – kao na vežbama
+        if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) depthTestEnabled = true;
+        if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) depthTestEnabled = false;
+        if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) cullFaceEnabled = true;
+        if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) cullFaceEnabled = false;
+
         // Strelice levo/desno – kamera se kreće po kružnoj putanji oko automata
         const float orbitSpeed = 55.0f;  // stepeni u sekundi
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)  cameraYaw += orbitSpeed * dt;
@@ -1085,11 +1095,11 @@ int main(void)
         glBindVertexArray(0);
         
         // ZATIM RENDERUJEMO .obj model automata - PRVO NEPROZIRNI DELOVI (medved i zec se crtaju POSLE da ne budu zaklonjeni)
-        // Resetujemo OpenGL stanja pre renderovanja automata
-        glEnable(GL_DEPTH_TEST);
+        // Resetujemo OpenGL stanja pre renderovanja automata (poštujemo tastere 1–4 za dubinu i culling)
+        if (depthTestEnabled) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_CULL_FACE); // Za neprozirne delove
+        if (cullFaceEnabled) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);
         
         glUniform1i(glGetUniformLocation(unifiedShader, "useTex"), 0); // Ne koristimo teksturu za .obj model
         
@@ -1175,7 +1185,7 @@ int main(void)
                 glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialSpecular"), mat->Ks.r, mat->Ks.g, mat->Ks.b);
                 glUniform1f(glGetUniformLocation(unifiedShader, "uMaterialShininess"), mat->Ns);
                 glUniform4f(glGetUniformLocation(unifiedShader, "uColor"), mat->Kd.r, mat->Kd.g, mat->Kd.b, mat->d);
-                glEnable(GL_CULL_FACE);
+                if (cullFaceEnabled) glEnable(GL_CULL_FACE);
             }
             glUniform1i(glGetUniformLocation(unifiedShader, "transparent"), 0);
             
@@ -1186,7 +1196,7 @@ int main(void)
                 glDrawElements(GL_TRIANGLES, (unsigned int)count, GL_UNSIGNED_INT, (void*)(startIdx * sizeof(unsigned int)));
             }
             if (matName == "skin" || matName == "floor_metal")
-                glEnable(GL_CULL_FACE);  // vrati culling za sledeći materijal
+                if (cullFaceEnabled) glEnable(GL_CULL_FACE);  // vrati culling za sledeći materijal
         }
         
         glBindVertexArray(0);
@@ -1227,7 +1237,7 @@ int main(void)
         }
         
         // NA KRAJU RENDERUJEMO TRANSPARENTNE DELOVE AUTOMATA (staklo) - da se kandža vidi kroz njih
-        glEnable(GL_DEPTH_TEST);
+        if (depthTestEnabled) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glDisable(GL_CULL_FACE); // Isključeno za transparent objekte
@@ -1302,7 +1312,7 @@ int main(void)
             glBindVertexArray(overlayVAO);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
             glBindVertexArray(0);
-            glEnable(GL_DEPTH_TEST);
+            if (depthTestEnabled) glEnable(GL_DEPTH_TEST);
             glUniform1i(glGetUniformLocation(unifiedShader, "overlayMode"), 0);  // vrati za 3D scenu
             glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(savedProj));
             glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(savedView));
