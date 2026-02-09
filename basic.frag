@@ -10,6 +10,7 @@ uniform sampler2D uTex;
 uniform vec4 uColor;
 uniform bool useTex;
 uniform bool transparent;
+uniform bool overlayMode;  // kada true: samo tekstura * uColor, bez osvetljenja (za 2D overlay)
 
 // Osvetljenje
 uniform vec3 uLightPos;
@@ -25,11 +26,18 @@ uniform float uMaterialShininess;
 void main()
 {
     vec3 color = uColor.rgb;
-    
+    vec4 texCol = vec4(1.0);
     if (useTex)
     {
-        vec4 texCol = texture(uTex, chTex);
+        texCol = texture(uTex, chTex);
         color = texCol.rgb;
+    }
+
+    // Overlay režim: samo tekstura * uColor, bez osvetljenja (slova ostaju oštra i vidljiva)
+    if (overlayMode && useTex)
+    {
+        outCol = texCol * uColor;
+        return;
     }
 
     // Ambient

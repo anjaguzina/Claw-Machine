@@ -559,11 +559,15 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    // Full screen: koristi primarni monitor i rezoluciju ekrana
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    unsigned int wWidth = (unsigned int)mode->width;
+    unsigned int wHeight = (unsigned int)mode->height;
+
     GLFWwindow* window;
-    unsigned int wWidth = 1000;
-    unsigned int wHeight = 1000;
     const char wTitle[] = "Bird in a Claw Machine";
-    window = glfwCreateWindow(wWidth, wHeight, wTitle, NULL, NULL);
+    window = glfwCreateWindow(wWidth, wHeight, wTitle, monitor, NULL);
     
     if (window == NULL)
     {
@@ -784,6 +788,38 @@ int main(void)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, lightBulbEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, lightBulbIndices.size() * sizeof(unsigned int), lightBulbIndices.data(), GL_STATIC_DRAW);
     
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(7 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (void*)(10 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+    glBindVertexArray(0);
+    
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++ OVERLAY – potpis (ime, prezime, indeks) u uglu +++++++++++++++++++++++++++++++++++++++++++++++++
+    // Tekstura treba da sadrži "Anja Guzina RA 18/2022" velikim belim slovima (možete zameniti signature.png)
+    unsigned int signatureTex = loadImageToTexture("Resources/signature.png");
+    // Quad u NDC za donji levi ugao: ista širina, samo rastegnuto na gore da se bolje vide slova
+    float overlayW = 0.42f, overlayH = 0.32f;   // samo visina povećana (rastegnuto na gore)
+    float ox0 = -0.98f, oy0 = -0.94f;  // levo dole
+    float overlayVerts[] = {
+        ox0,         oy0,         0.0f,  1.0f, 1.0f, 1.0f, 1.0f,  0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+        ox0,         oy0+overlayH, 0.0f,  1.0f, 1.0f, 1.0f, 1.0f,  0.0f, 1.0f,  0.0f, 1.0f, 0.0f,
+        ox0+overlayW, oy0+overlayH, 0.0f,  1.0f, 1.0f, 1.0f, 1.0f,  1.0f, 1.0f,  0.0f, 1.0f, 0.0f,
+        ox0+overlayW, oy0,         0.0f,  1.0f, 1.0f, 1.0f, 1.0f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+    };
+    unsigned int overlayIndices[] = { 0, 1, 2,  0, 2, 3 };
+    unsigned int overlayVAO, overlayVBO, overlayEBO;
+    glGenVertexArrays(1, &overlayVAO);
+    glGenBuffers(1, &overlayVBO);
+    glGenBuffers(1, &overlayEBO);
+    glBindVertexArray(overlayVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, overlayVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(overlayVerts), overlayVerts, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, overlayEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(overlayIndices), overlayIndices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
@@ -1222,8 +1258,43 @@ int main(void)
         
         glBindVertexArray(0);
         
+        // Overlay – poluprovidna tekstura sa imenom, prezimenom i indeksom (donji levi ugao)
+        {
+            glm::mat4 savedProj = projectionP;
+            glm::mat4 savedView = view;
+            glm::mat4 orthoProj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+            glm::mat4 identityView = glm::mat4(1.0f);
+            glm::mat4 identityModel = glm::mat4(1.0f);
+            glDisable(GL_DEPTH_TEST);
+            glUseProgram(unifiedShader);
+            glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(orthoProj));
+            glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(identityView));
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(identityModel));
+            glUniform1i(glGetUniformLocation(unifiedShader, "useTex"), 1);
+            glUniform1i(glGetUniformLocation(unifiedShader, "overlayMode"), 1);  // bez osvetljenja – tekstura direktno, slova oštra
+            glUniform1i(glGetUniformLocation(unifiedShader, "transparent"), 0);
+            glUniform4f(glGetUniformLocation(unifiedShader, "uColor"), 1.0f, 1.0f, 1.0f, 0.95f);  // skoro puna vidljivost
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, signatureTex);
+            glBindVertexArray(overlayVAO);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+            glEnable(GL_DEPTH_TEST);
+            glUniform1i(glGetUniformLocation(unifiedShader, "overlayMode"), 0);  // vrati za 3D scenu
+            glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(savedProj));
+            glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(savedView));
+        }
+        
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        // Frame limiter — 75 FPS
+        {
+            static double frameLimitStart = glfwGetTime();
+            double targetFrameTime = 1.0 / 75.0;
+            while (glfwGetTime() - frameLimitStart < targetFrameTime) {}
+            frameLimitStart = glfwGetTime();
+        }
     }
     
     // ========== KRAJ NOVOG RENDER LOOP-A ==========
@@ -1259,7 +1330,11 @@ int main(void)
     glDeleteBuffers(1, &lightBulbVBO);
     glDeleteVertexArrays(1, &lightBulbVAO);
     
-   
+    // Cleanup za overlay (potpis)
+    glDeleteBuffers(1, &overlayEBO);
+    glDeleteBuffers(1, &overlayVBO);
+    glDeleteVertexArrays(1, &overlayVAO);
+    glDeleteTextures(1, &signatureTex);
     
     glDeleteProgram(unifiedShader);
 
