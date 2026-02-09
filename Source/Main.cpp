@@ -441,7 +441,7 @@ const float playFloorMinX = -0.1f, playFloorMaxX = 0.1f, playFloorMinZ = -0.1f, 
 const float holeMinX = -0.14f, holeMaxX = 0.14f, holeMinZ = -0.14f, holeMaxZ = 0.14f;
 // Donja pregrada – osvojena igračka na Y -0.20 (ispod površine dna)
 const float prizeX = 0.0f, prizeY = -0.32f, prizeZ = 0.25f;   // niže u pregradi
-float birdToyX = 0.14f, birdToyY = -0.12f, birdToyZ = 0.02f;   // zec udesno
+float birdToyX = 0.06f, birdToyY = -0.12f, birdToyZ = 0.02f;   // zec – pomeren ulevo da uho ne viri iz stakla
 const float prize2X = 0.08f, prize2Y = -0.32f, prize2Z = 0.25f;
 const float grabRadiusWorld = 0.12f;  // radijus hvatanja (veći da se lakše uhvate medved i zec)
 const float clawTipOffset = 0.32f;    // igračka niže kod pipaka da se vidi cela (clawY - offset)
@@ -649,7 +649,7 @@ int main(void)
     OBJModel bearModel = loadOBJ("Resources/bearobj.obj");
     OBJModel rabbitModel = loadOBJ("Resources/rabbit.obj");
     const float bearScale = 0.03f;   // manje dimenzije
-    const float rabbitScale = 0.026f; // zec manji
+    const float rabbitScale = 0.022f; // zec manji da uho ne viri iz izloga/stakla
     
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++ UNIFORME +++++++++++++++++++++++++++++++++++++++++++++++++
     
