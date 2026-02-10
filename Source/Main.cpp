@@ -485,7 +485,11 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
         mousePressed = true;
         glfwGetCursorPos(window, &lastMouseX, &lastMouseY);
         // Ubacivanje žetona i preuzimanje igračke samo kad je kamera otprilike ispred automata
-        bool inFront = (cameraYaw >= -cameraInFrontYawHalf && cameraYaw <= cameraInFrontYawHalf);
+        // Normalizuj yaw na [-180,180] da posle punog kruga (360°) opet važi „ispred”
+        float yawNorm = cameraYaw;
+        while (yawNorm > 180.0f)  yawNorm -= 360.0f;
+        while (yawNorm < -180.0f) yawNorm += 360.0f;
+        bool inFront = (yawNorm >= -cameraInFrontYawHalf && yawNorm <= cameraInFrontYawHalf);
         if (!inFront) return;
 
         int width, height;
@@ -923,8 +927,11 @@ int main(void)
             lKeyPressed = false;
         }
         
-        // Kontrole za kandžu – samo kad je kamera ispred automata, automat uključen, nema treptanja i sijalica je upaljena
-        bool cameraInFront = (cameraYaw >= -cameraInFrontYawHalf && cameraYaw <= cameraInFrontYawHalf);
+        // Kontrole za kandžu – samo kad je kamera ispred automata (yaw normalizovan da pun krug radi)
+        float yawNorm = cameraYaw;
+        while (yawNorm > 180.0f)  yawNorm -= 360.0f;
+        while (yawNorm < -180.0f) yawNorm += 360.0f;
+        bool cameraInFront = (yawNorm >= -cameraInFrontYawHalf && yawNorm <= cameraInFrontYawHalf);
         static bool wPressed = false, aPressed = false, sPressed = false, dPressed = false;
         const float oneStep = 0.14f;  // veći korak po jednom pritisku WASD
         if (cameraInFront && machineOn && !prizeBlinking && lightOn)
@@ -1062,18 +1069,21 @@ int main(void)
         glUniform1i(glGetUniformLocation(unifiedShader, "transparent"), 0);
         glUniform1i(glGetUniformLocation(unifiedShader, "useTex"), 0);
         
-        // Boja sijalice: zeleno-crveno samo dok treperi (čekanje klika na igračku); posle klika + crveno dugme = svetlo plavo
+        // Boja sijalice: zeleno-crveno trepćuće – isti 3D senčenje kao plava/tamno plava (sféra, ne ravna tekstura)
         if (prizeBlinking)
         {
-            // Jako ambient + diffuse da sijalica bude dobro vidljiva (ne tamni od osvetljenja)
             if (blinkGreen) {
                 glUniform4f(glGetUniformLocation(unifiedShader, "uColor"), 0.0f, 1.0f, 0.0f, 1.0f);
-                glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialAmbient"), 1.0f, 1.0f, 1.0f);
-                glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialDiffuse"), 1.0f, 1.0f, 1.0f);
+                glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialAmbient"), 0.35f, 0.5f, 0.35f);
+                glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialDiffuse"), 0.6f, 0.9f, 0.6f);
+                glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialSpecular"), 0.5f, 0.6f, 0.5f);
+                glUniform1f(glGetUniformLocation(unifiedShader, "uMaterialShininess"), 48.0f);
             } else {
                 glUniform4f(glGetUniformLocation(unifiedShader, "uColor"), 1.0f, 0.0f, 0.0f, 1.0f);
-                glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialAmbient"), 1.0f, 1.0f, 1.0f);
-                glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialDiffuse"), 1.0f, 1.0f, 1.0f);
+                glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialAmbient"), 0.5f, 0.35f, 0.35f);
+                glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialDiffuse"), 0.9f, 0.6f, 0.6f);
+                glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialSpecular"), 0.6f, 0.5f, 0.5f);
+                glUniform1f(glGetUniformLocation(unifiedShader, "uMaterialShininess"), 48.0f);
             }
         }
         else if (!machineOn)
