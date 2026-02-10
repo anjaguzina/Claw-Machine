@@ -2,7 +2,8 @@
 
 3. da na space padne na dno a ne da dno proguta igracku
 
-5. poravi polozaj gde se kupi igracka treba pregrada
 
+4. da uho kod zeke ne ispada van stakla automata kad sam skroz levo
+5. da nema bounce efekta i zaranjanja kod kupljenja igracke
 
 

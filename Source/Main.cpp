@@ -439,8 +439,11 @@ int carriedWhich = 0;     // 0 = ništa, 1 = medved, 2 = zec
 const float toyFloorY = -0.16f;  // visina pada na dnu (privremeno -0.16 za test svetala)
 // Granice poda – igračka ostaje unutar vidljivog dna (ne iza/van automata)
 const float playFloorMinX = -0.1f, playFloorMaxX = 0.1f, playFloorMinZ = -0.1f, playFloorMaxZ = 0.1f;
-// Rupa = ceo opseg kandže (cwx/cwz do ±0.13) da svako puštanje bude inHole
-const float holeMinX = -0.14f, holeMaxX = 0.14f, holeMinZ = -0.14f, holeMaxZ = 0.14f;
+// Rupa = kvadratni isečak S LEVE STRANE dna automata;
+// kad mesto PADA igračke (dropX, dropZ) padne u ovu oblast → inHole, pregrada + trepćuće svetlo;
+// inače igračka ostaje na podu.
+const float holeMinX = -0.12f, holeMaxX = 0.02f;  // levo: šira oblast da sigurno uhvati rupu
+const float holeMinZ = -0.02f, holeMaxZ = 0.12f;  // prednji levi kvadrat (rupa)
 // Donja leva pregrada – obe igračke unutar pregrade; smanjen skala da ništa ne strši kroz metal (uvo zeke, ivice meda)
 const float prizeX = -0.15f, prizeY = -0.41f, prizeZ = 0.18f;   // obe igračke u pregradi, spušteno na dno
 float birdToyX = 0.06f, birdToyY = -0.12f, birdToyZ = 0.02f;   // zec – pomeren ulevo da uho ne viri iz stakla
@@ -941,11 +944,12 @@ int main(void)
                 if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !spacePressedPrev)
                 {
                     float cwx = machineScale * clawX, cwz = machineScale * clawZ;
-                    bool inHole = (cwx >= holeMinX && cwx <= holeMaxX && cwz >= holeMinZ && cwz <= holeMaxZ);
-                    std::cout << "[SPACE pustio] cwx=" << cwx << " cwz=" << cwz << " inHole=" << (inHole ? "DA" : "NE") << std::endl;
-                    // Ograniči mesto pada na dnu da igračka ne ispadne iza/van automata
+                    // Mesto na koje igračka pada (ista visina kao pod – tu se odlučuje da li je „u rupi”)
                     float dropX = std::min(playFloorMaxX, std::max(playFloorMinX, cwx));
                     float dropZ = std::min(playFloorMaxZ, std::max(playFloorMinZ, cwz));
+                    // inHole = da li mesto PADA (na dnu) ulazi u oblast rupe – tada ide u pregradu i trepće svetlo
+                    bool inHole = (dropX >= holeMinX && dropX <= holeMaxX && dropZ >= holeMinZ && dropZ <= holeMaxZ);
+                    std::cout << "[SPACE pustio] dropX=" << dropX << " dropZ=" << dropZ << " inHole=" << (inHole ? "DA" : "NE") << std::endl;
                     if (carriedWhich == 1)
                     {
                         if (inHole) {
