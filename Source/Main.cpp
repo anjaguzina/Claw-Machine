@@ -995,7 +995,8 @@ int main(void)
                 {
                     if (clawY < 0.5f)
                     {
-                        if (clawY <= -1.22f)
+                        // Kada se kandža dovoljno spusti (ne mora skroz do dna) proveravamo hvatanje igračke
+                        if (clawY <= -1.0f)
                         {
                             float cwx = machineScale * clawX, cwz = machineScale * clawZ;
                             float dxC = cwx - toyCubeX, dzC = cwz - toyCubeZ;
@@ -1245,9 +1246,13 @@ int main(void)
         }
         
         // Kandža (pink) – crtamo POSLE igračaka sa depth offset-om kada drži igračku (da ne bledi)
+        // Kandža: jači offset kad nosi medveda (širi model) da ne bledi, slabiji za zeca
         if (carriedWhich == 1 || carriedWhich == 2) {
             glEnable(GL_POLYGON_OFFSET_FILL);
-            glPolygonOffset(-1.0f, -1.0f);  // kandža malo bliže kameri da bude uvek vidljiva
+            if (carriedWhich == 1)
+                glPolygonOffset(-2.5f, -2.5f);  // medved širi – kandža više „ispred” da se ne gubi
+            else
+                glPolygonOffset(-1.0f, -1.0f);  // zec uži – manji offset dovoljan
         }
         glBindVertexArray(clawMachine.VAO);
         for (const auto& group : materialRanges) {
