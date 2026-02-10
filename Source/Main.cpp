@@ -436,7 +436,7 @@ bool birdWon = false;
 bool birdCollected = false; // true = kliknuto na zeca u pregradi, igračka nestane, pa se gasi automat
 bool birdOnFloor = false; // ptica bačena na sivo dno (ne u rupu) – crtamo je na birdToy poziciji
 int carriedWhich = 0;     // 0 = ništa, 1 = medved, 2 = zec
-const float toyFloorY = -0.16f;  // visina pada na dnu (privremeno -0.16 za test svetala)
+const float toyFloorY = -0.10f;  // visina na ivici/površini dna – igračka sedi NA podu, ne tone u njega
 // Granice poda – igračka ostaje unutar vidljivog dna (ne iza/van automata)
 const float playFloorMinX = -0.1f, playFloorMaxX = 0.1f, playFloorMinZ = -0.1f, playFloorMaxZ = 0.1f;
 // Rupa = kvadratni isečak S LEVE STRANE dna automata;
