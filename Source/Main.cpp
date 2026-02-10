@@ -1001,11 +1001,14 @@ int main(void)
                             float dxC = cwx - toyCubeX, dzC = cwz - toyCubeZ;
                             float dxB = cwx - birdToyX, dzB = cwz - birdToyZ;
                             float r2 = grabRadiusWorld * grabRadiusWorld;
-                            if (!toyWon && dxC*dxC + dzC*dzC < r2)
+                            if (!toyWon && dxC*dxC + dzC*dzC < r2) {
                                 carriedWhich = 1;
+                                clawY = -0.9f;  // odmah podigni kandžu da igračka ne zaranja kroz dno
+                            }
                             else if (!birdWon && dxB*dxB + dzB*dzB < r2) {
                                 carriedWhich = 2;
                                 birdOnFloor = false;  // više nije na dnu, u kandži je
+                                clawY = -0.9f;  // odmah podigni kandžu da igračka ne zaranja kroz dno
                             }
                         }
                         clawY += clawLowerSpeed;
@@ -1181,14 +1184,10 @@ int main(void)
             if (matName == "pink_frame") continue;
             if (matName == "black") continue;
             if (matName == "bird" || matName == "bird_red") continue;  // pticu ne crtamo uopšte
+            if (matName == "pink") continue;  // kandžu crtamo POSLE igračke u kandži da ne bledi
             
-            // Kandža (pink) se pomera; ostali delovi koriste modelMatrix
-            if (matName == "pink") {
-                glm::mat4 pinkMatrix = glm::translate(modelMatrix, glm::vec3(clawX, clawY, clawZ));
-                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pinkMatrix));
-            } else {
-                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-            }
+            // Ostali delovi koriste modelMatrix
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
             // Dno automata - skin materijal kao u popravka.obj (opaque sivo)
             if (matName == "skin" || matName == "floor_metal") {
                 glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialAmbient"), mat->Ka.r, mat->Ka.g, mat->Ka.b);
@@ -1243,6 +1242,47 @@ int main(void)
                 carriedMatrix = glm::scale(carriedMatrix, glm::vec3(rabbitScale, rabbitScale, rabbitScale));
                 drawOBJModel(rabbitModel, carriedMatrix, modelLoc, unifiedShader);
             }
+        }
+        
+        // Kandža (pink) – crtamo POSLE igračaka sa depth offset-om kada drži igračku (da ne bledi)
+        if (carriedWhich == 1 || carriedWhich == 2) {
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(-1.0f, -1.0f);  // kandža malo bliže kameri da bude uvek vidljiva
+        }
+        glBindVertexArray(clawMachine.VAO);
+        for (const auto& group : materialRanges) {
+            unsigned int matID = group.first;
+            const std::vector<std::pair<size_t, size_t>>& ranges = group.second;
+            Material* mat = nullptr;
+            if (matIDToName.find(matID) != matIDToName.end()) {
+                std::string matName = matIDToName[matID];
+                if (clawMachine.materials.find(matName) != clawMachine.materials.end()) {
+                    mat = &clawMachine.materials[matName];
+                }
+            }
+            if (!mat || mat->d < 1.0f) continue;
+            std::string matName = (matIDToName.find(matID) != matIDToName.end()) ? matIDToName[matID] : "";
+            if (matName != "pink") continue;  // samo kandža
+            
+            glm::mat4 pinkMatrix = glm::translate(modelMatrix, glm::vec3(clawX, clawY, clawZ));
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(pinkMatrix));
+            glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialAmbient"), mat->Ka.r, mat->Ka.g, mat->Ka.b);
+            glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialDiffuse"), mat->Kd.r, mat->Kd.g, mat->Kd.b);
+            glUniform3f(glGetUniformLocation(unifiedShader, "uMaterialSpecular"), mat->Ks.r, mat->Ks.g, mat->Ks.b);
+            glUniform1f(glGetUniformLocation(unifiedShader, "uMaterialShininess"), mat->Ns);
+            glUniform4f(glGetUniformLocation(unifiedShader, "uColor"), mat->Kd.r, mat->Kd.g, mat->Kd.b, mat->d);
+            glUniform1i(glGetUniformLocation(unifiedShader, "transparent"), 0);
+            if (cullFaceEnabled) glEnable(GL_CULL_FACE);
+            
+            for (const auto& range : ranges) {
+                size_t startIdx = range.first;
+                size_t count = range.second;
+                glDrawElements(GL_TRIANGLES, (unsigned int)count, GL_UNSIGNED_INT, (void*)(startIdx * sizeof(unsigned int)));
+            }
+        }
+        glBindVertexArray(0);
+        if (carriedWhich == 1 || carriedWhich == 2) {
+            glDisable(GL_POLYGON_OFFSET_FILL);
         }
         
         // Zec (druga igračka) – crtamo osim kad je u kandži ili kad je pokupljen (nestane)

@@ -5,6 +5,6 @@
 
 4. da uho kod zeke ne ispada van stakla automata kad sam skroz levo
 5. da nema bounce efekta i zaranjanja kod kupljenja igracke
-6. svetlo crveno zeleno da bude 3d
+
 
 
