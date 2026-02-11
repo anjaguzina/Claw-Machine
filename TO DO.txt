@@ -1,6 +1,6 @@
 1. kanap ne zaboravi
 
-
+2. proveri jel lampica izvor svetlosti
 
 
 4. da uho kod zeke ne ispada van stakla automata kad sam skroz levo

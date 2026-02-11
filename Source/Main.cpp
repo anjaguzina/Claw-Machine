@@ -450,6 +450,8 @@ float birdToyX = 0.06f, birdToyY = -0.12f, birdToyZ = 0.02f;   // zec – pomere
 const float prizeInCompartmentScale = 0.62f;  // u pregradi smanjeno da metal fizički „zakloni” ivice – ništa ne probija zid
 const float grabRadiusWorld = 0.12f;  // radijus hvatanja (veći da se lakše uhvate medved i zec)
 const float clawTipOffset = 0.32f;    // igračka niže kod pipaka da se vidi cela (clawY - offset)
+const float clawRopeTopOffset = 0.28f; // visina vrha kandže iznad njenog pivot-a (clawY)
+const float sipkaTopOffset = 0.42f;    // visina vrha sipke (roze šipke) iznad clawY – kanap se kači na vrh sipke, ne na kandžu
 const float machineScale = 0.1f;      // modelMatrix scale za automat
 
 // Globalne promenljive za sijalicu i stanje automata
@@ -661,6 +663,15 @@ int main(void)
     OBJModel rabbitModel = loadOBJ("Resources/rabbit.obj");
     const float bearScale = 0.03f;   // manje dimenzije
     const float rabbitScale = 0.022f; // zec manji da uho ne viri iz izloga/stakla
+
+    // Učitavanje kanapa (corde pendu) – spona između vrha automata i kandže
+    std::cout << "Ucitavam corde pendu.obj (kanap)..." << std::endl;
+    OBJModel ropeModel = loadOBJ("Resources/corde pendu.obj");
+    if (ropeModel.indexCount > 0)
+        std::cout << "Kanap ucitan! Broj trouglova: " << ropeModel.indexCount / 3 << std::endl;
+    // Konstante za pozicioniranje kanapa: model ima Y od ~-3.8 do ~275; gornji deo kanapa (koji dodiruje automat) mapiramo na vrh
+    const float ropeModelHeight = 279.0f;
+    const float ropeModelTopY = -3.8f;   // Y u .obj koji treba da dodiruje vrh automata (0.5) – prvi mesh je „gore”
     
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++ UNIFORME +++++++++++++++++++++++++++++++++++++++++++++++++
     
@@ -1245,6 +1256,22 @@ int main(void)
             }
         }
         
+        // Kanap (corde pendu) – vrh kanapa na vrhu automata (0.5), dno na VRHU SIPKE; podignut nagore po Y da se vidi
+        if (clawY < 0.5f && ropeModel.indexCount > 0) {
+            const float ropeLiftY = 2.2f;   // pomeranje kanapa nagore po Y osi
+            const float ropeForwardZ = 0.04f;  // kanap malo napred po Z da se nadoveže na sipku (ne ispred/iza)
+            float ropeBottomY = clawY + sipkaTopOffset;
+            float ropeLen = 0.5f - ropeBottomY;
+            if (ropeLen > 0.001f) {
+                float scaleY = (ropeBottomY - 0.5f) / ropeModelHeight;
+                float transY = 0.5f - ropeModelTopY * scaleY + ropeLiftY;
+                float ropeScaleXZ = 0.045f;
+                glm::mat4 ropeMatrix = glm::translate(modelMatrix, glm::vec3(clawX, transY, clawZ + ropeForwardZ));
+                ropeMatrix = glm::scale(ropeMatrix, glm::vec3(ropeScaleXZ, scaleY, ropeScaleXZ));
+                drawOBJModel(ropeModel, ropeMatrix, modelLoc, unifiedShader);
+            }
+        }
+
         // Kandža (pink) – crtamo POSLE igračaka sa depth offset-om kada drži igračku (da ne bledi)
         // Kandža: jači offset kad nosi medveda (širi model) da ne bledi, slabiji za zeca
         if (carriedWhich == 1 || carriedWhich == 2) {
@@ -1410,6 +1437,13 @@ int main(void)
     glDeleteBuffers(1, &claw.EBO);
     glDeleteBuffers(1, &claw.VBO);
     glDeleteVertexArrays(1, &claw.VAO);
+
+    // Cleanup za kanap (corde pendu)
+    if (ropeModel.indexCount > 0) {
+        glDeleteBuffers(1, &ropeModel.EBO);
+        glDeleteBuffers(1, &ropeModel.VBO);
+        glDeleteVertexArrays(1, &ropeModel.VAO);
+    }
     
     // Cleanup za roze kocku (više se ne crta, ali VAO ostaje za kompatibilnost)
     glDeleteBuffers(1, &toyCubeVBO);
