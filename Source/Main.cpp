@@ -1059,8 +1059,8 @@ int main(void)
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionP));
 
-        // Osvetljenje
-        glm::vec3 lightPos(2.0f, 3.0f, 2.0f);
+        // Osvetljenje – lampa (sijalica) je izvor svetlosti, uz ambijentalno svetlo
+        glm::vec3 lightPos(0.0f, 0.5f, 0.0f);  // ista pozicija kao sijalica na vrhu automata
         glm::vec3 viewPos = cameraPos; // Koristimo trenutnu poziciju kamere
         glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
         glUniform3f(glGetUniformLocation(unifiedShader, "uLightPos"), lightPos.x, lightPos.y, lightPos.z);
