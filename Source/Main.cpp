@@ -446,6 +446,7 @@ const float holeMinX = -0.12f, holeMaxX = 0.02f;  // levo: šira oblast da sigur
 const float holeMinZ = -0.02f, holeMaxZ = 0.12f;  // prednji levi kvadrat (rupa)
 // Donja leva pregrada – obe igračke unutar pregrade; smanjen skala da ništa ne strši kroz metal (uvo zeke, ivice meda)
 const float prizeX = -0.15f, prizeY = -0.41f, prizeZ = 0.18f;   // obe igračke u pregradi, spušteno na dno
+const float tokenHoleX = 0.1f, tokenHoleY = -0.35f, tokenHoleZ = 0.2f;  // 3D pozicija rupe za žetone (slot desno od poluge)
 float birdToyX = 0.06f, birdToyY = -0.12f, birdToyZ = 0.02f;   // zec – pomeren ulevo da uho ne viri iz stakla
 const float prizeInCompartmentScale = 0.62f;  // u pregradi smanjeno da metal fizički „zakloni” ivice – ništa ne probija zid
 const float grabRadiusWorld = 0.12f;  // radijus hvatanja (veći da se lakše uhvate medved i zec)
@@ -456,7 +457,7 @@ const float machineScale = 0.1f;      // modelMatrix scale za automat
 
 // Globalne promenljive za sijalicu i stanje automata
 bool lightOn = false;       // sijalica upaljena (svetlo plava) kad je automat uključen
-bool machineOn = true;      // false = automat isključen (tamno plava), tek crveno dugme ga ponovo uključi
+bool machineOn = true;      // false = automat isključen (tamno plava), tek klik na rupu za žetone ga ponovo uključi
 bool prizeBlinking = false; // true = osvojena igračka u pregradi, sijalica treperi zeleno-crveno
 float blinkTimer = 0.0f;    // tajmer za naizmenično zeleno/crveno na 0.5s
 bool blinkGreen = true;     // trenutno zeleno ili crveno
@@ -527,14 +528,20 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
             }
         }
 
-        // Klik na crveno dugme / ubacivanje žetona (leva strana ekrana – prikladan objekat)
-        if (mouseXNorm < 0.6 && mouseXNorm > 0.0 && mouseYNorm > 0.2 && mouseYNorm < 0.8)
+        // Klik na rupu za žetone (slot) – ubacivanje žetona / uključivanje automata (tekstura rupe, ne crveno dugme)
         {
-            if (!machineOn) {
-                machineOn = true;
-                lightOn = true;  // ubacivanje žetona = uključivanje automata
-            } else if (!prizeBlinking) {
-                lightOn = !lightOn;
+            double slotSx, slotSy;
+            worldToScreen(glm::vec3(tokenHoleX, tokenHoleY, tokenHoleZ), width, height, slotSx, slotSy);
+            const double tokenHoleHitRadius = 55.0;  // pikseli – oblast klika oko rupe za žetone
+            bool hitTokenHole = ((lastMouseX - slotSx) * (lastMouseX - slotSx) + (lastMouseY - slotSy) * (lastMouseY - slotSy)) < (tokenHoleHitRadius * tokenHoleHitRadius);
+            if (hitTokenHole)
+            {
+                if (!machineOn) {
+                    machineOn = true;
+                    lightOn = true;  // ubacivanje žetona = uključivanje automata
+                } else if (!prizeBlinking) {
+                    lightOn = !lightOn;
+                }
             }
         }
     }
